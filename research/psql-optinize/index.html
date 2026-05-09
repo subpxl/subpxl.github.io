@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Psql Optinize.
+File: seeder.go package mainimport (&#34;context&#34; …"><meta property="og:title" content="Psql Optinize"><meta property="og:description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Psql Optinize.
+File: seeder.go package mainimport (&#34;context&#34; …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/research/psql-optinize/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    
+    <span class="badge bg-secondary mb-3">Deep Dive</span>
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">Psql Optinize</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <h2 id="research--code-notes">Research &amp; Code Notes</h2>
+<p>This document contains text-heavy extracts and code snippets from my research on Psql Optinize.</p>
+<h3 id="file-seedergo">File: seeder.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;context&#34;
+	&#34;fmt&#34;
+	&#34;math/rand&#34;
+	&#34;time&#34;
+
+	&#34;github.com/jackc/pgx/v5&#34;
+	&#34;github.com/jackc/pgx/v5/pgxpool&#34;
+)
+
+// ── Configuration ───────────────────────────────────────────
+const (
+	numCustomers     = 1000
+	numProducts      = 5000
+	numOrders        = 300000
+	numReviews       = 200000
+	numInventoryLogs = 100000
+
+	// Update your connection string here
+	postgresDSN = &#34;postgres://user:password@localhost:5432/testdb?sslmode=disable&#34;
+)
+
+var (
+	countries = []string{&#34;US&#34;, &#34;IN&#34;, &#34;UK&#34;, &#34;CA&#34;, &#34;DE&#34;, &#34;JP&#34;, &#34;FR&#34;, &#34;AU&#34;, &#34;BR&#34;, &#34;SG&#34;}
+	segments  = []string{&#34;free&#34;, &#34;basic&#34;, &#34;premium&#34;, &#34;enterprise&#34;}
+	statuses  = []string{&#34;pending&#34;, &#34;paid&#34;, &#34;shipped&#34;, &#34;cancelled&#34;}
+	reasons   = []string{&#34;sale&#34;, &#34;restock&#34;, &#34;adjustment&#34;}
+	categories = []string{&#34;Electronics&#34;, &#34;Clothing&#34;, &#34;Books&#34;, &#34;Toys&#34;, &#34;Sports&#34;, &#34;Beauty&#34;, &#34;Automotive&#34;}
+)
+
+func main() {
+	ctx := context.Background()
+	rand.Seed(time.Now().UnixNano())
+
+	// Initialize Connection Pool
+	config, err := pgxpool.ParseConfig(postgresDSN)
+	must(err)
+	db, err := pgxpool.NewWithConfig(ctx, config)
+	must(err)
+	defer db.Close()
+
+	fmt.Println(&#34;=== Seeding start (Using pgx/v5) ===&#34;)
+
+	catIDs := seedCategories(ctx, db)
+	prodIDs := seedProducts(ctx, db, catIDs)
+	custIDs := seedCustomers(ctx, db)
+	
+	// Large datasets
+	orderIDs := seedOrders(ctx, db, custIDs)
+	seedOrderItems(ctx, db, orderIDs, prodIDs)
+	seedReviews(ctx, db, custIDs, prodIDs)
+	seedInventoryLog(ctx, db, prodIDs)
+
+	fmt.Println(&#34;=== Seeding complete ===&#34;)
+}
+
+// ── Categories (Simple Inserts) ─────────────────────────────
+func seedCategories(ctx context.Context, db *pgxpool.Pool) []int {
+	var ids []int
+	for _, name := range categories {
+		var id int
+		err := db.QueryRow(ctx, &#34;INSERT INTO categories (name) VALUES ($1) RETURNING id&#34;, name).Scan(&amp;id)
+		must(err)
+		ids = append(ids, id)
+	}
+	return ids
+}
+
+// ── Products (Inserts with Returning) ───────────────────────
+func seedProducts(ctx context.Context, db *pgxpool.Pool, catIDs []int) []int {
+	var ids []int
+	base := time.Now().AddDate(-2, 0, 0)
+	for i := 1; i &lt;= numProducts; i++ {
+		var id int
+		err := db.QueryRow(ctx, 
+			&#34;INSERT INTO products (name, category_id, price, stock, created_at) VALUES ($1,$2,$3,$4,$5) RETURNING id&#34;,
+			fmt.Sprintf(&#34;Product_%d&#34;, i),
+			catIDs[rand.Intn(len(catIDs))],
+			float64(rand.Intn(49000)+1000)/100,
+			rand.Intn(500),
+			base.Add(randDuration(2*365*24)),
+		).Scan(&amp;id)
+		must(err)
+		ids = append(ids, id)
+		logProgress(&#34;products&#34;, i, numProducts)
+	}
+	return ids
+}
+
+// ── Customers (Inserts with Returning) ──────────────────────
+func seedCustomers(ctx context.Context, db *pgxpool.Pool) []int {
+	var ids []int
+	base := time.Now().AddDate(-3, 0, 0)
+	for i := 1; i &lt;= numCustomers; i++ {
+		var id int
+		err := db.QueryRow(ctx, 
+			&#34;INSERT INTO customers (name, email, country, segment, created_at) VALUES ($1,$2,$3,$4,$5) RETURNING id&#34;,
+			fmt.Sprintf(&#34;Customer_%d&#34;, i),
+			fmt.Sprintf(&#34;cust_%d@example.com&#34;, i),
+			countries[rand.Intn(len(countries))],
+			segments[rand.Intn(len(segments))],
+			base.Add(randDuration(3*365*24)),
+		).Scan(&amp;id)
+		must(err)
+		ids = append(ids, id)
+		logProgress(&#34;customers&#34;, i, numCustomers)
+	}
+	return ids
+}
+
+// ── Orders (COPY with Batching) ──────────────────────────────
+func seedOrders(ctx context.Context, db *pgxpool.Pool, custIDs []int) []int {
+	base := time.Now().AddDate(-1, 0, 0)
+	var rows [][]interface{}
+	
+	for i := 0; i &lt; numOrders; i++ {
+		rows = append(rows, []interface{}{
+			custIDs[rand.Intn(len(custIDs))],
+			statuses[rand.Intn(len(statuses))],
+			base.Add(randDuration(365 * 24)),
+		})
+		
+		// Flush every 50k rows to keep memory low and DB happy
+		if len(rows) &gt;= 50000 {
+			_, err := db.CopyFrom(ctx, pgx.Identifier{&#34;orders&#34;}, []string{&#34;customer_id&#34;, &#34;status&#34;, &#34;created_at&#34;}, pgx.CopyFromRows(rows))
+			must(err)
+			rows = nil
+			logProgress(&#34;orders copy&#34;, i+1, numOrders)
+		}
+	}
+	if len(rows) &gt; 0 {
+		_, err := db.CopyFrom(ctx, pgx.Identifier{&#34;orders&#34;}, []string{&#34;customer_id&#34;, &#34;status&#34;, &#34;created_at&#34;}, pgx.CopyFromRows(rows))
+		must(err)
+	}
+
+	// Fetch IDs without ORDER BY for speed
+	res, err := db.Query(ctx, &#34;SELECT id FROM orders&#34;)
+	must(err)
+	defer res.Close()
+	var ids []int
+	for res.Next() {
+		var id int
+		must(res.Scan(&amp;id))
+		ids = append(ids, id)
+	}
+	return ids
+}
+
+// ── Order Items (COPY with Batching) ────────────────────────
+func seedOrderItems(ctx context.Context, db *pgxpool.Pool, orderIDs, prodIDs []int) {
+	prices := fetchPrices(ctx, db)
+	var rows [][]interface{}
+	totalCount := 0
+
+	for _, oID := range orderIDs {
+		itemsInOrder := rand.Intn(3) + 1
+		for j := 0; j &lt; itemsInOrder; j++ {
+			pID := prodIDs[rand.Intn(len(prodIDs))]
+			rows = append(rows, []interface{}{oID, pID, rand.Intn(5) + 1, prices[pID]})
+			totalCount++
+		}
+
+		if len(rows) &gt;= 50000 {
+			_, err := db.CopyFrom(ctx, pgx.Identifier{&#34;order_items&#34;}, []string{&#34;order_id&#34;, &#34;product_id&#34;, &#34;quantity&#34;, &#34;unit_price&#34;}, pgx.CopyFromRows(rows))
+			must(err)
+			rows = nil
+			logProgress(&#34;order_items copy&#34;, totalCount, -1)
+		}
+	}
+	if len(rows) &gt; 0 {
+		db.CopyFrom(ctx, pgx.Identifier{&#34;order_items&#34;}, []string{&#34;order_id&#34;, &#34;product_id&#34;, &#34;quantity&#34;, &#34;unit_price&#34;}, pgx.CopyFromRows(rows))
+	}
+}
+
+// ── Reviews &amp; Inventory (Simplified COPY) ────────────────────
+func seedReviews(ctx context.Context, db *pgxpool.Pool, custIDs, prodIDs []int) {
+	seen := make(map[[2]int]bool)
+	var rows [][]interface{}
+	base := time.Now().AddDate(-1, 0, 0)
+
+	for len(rows) &lt; numReviews {
+		cID := custIDs[rand.Intn(len(custIDs))]
+		pID := prodIDs[rand.Intn(len(prodIDs))]
+		if seen[[2]int{cID, pID}] { continue }
+		seen[[2]int{cID, pID}] = true
+
+		rows = append(rows, []interface{}{cID, pID, rand.Intn(5)+1, base.Add(randDuration(365*24))})
+		
+		if len(rows) % 50000 == 0 {
+			_, err := db.CopyFrom(ctx, pgx.Identifier{&#34;reviews&#34;}, []string{&#34;customer_id&#34;, &#34;product_id&#34;, &#34;rating&#34;, &#34;created_at&#34;}, pgx.CopyFromRows(rows[len(rows)-50000:]))
+			must(err)
+			logProgress(&#34;reviews copy&#34;, len(rows), numReviews)
+		}
+	}
+}
+
+func seedInventoryLog(ctx context.Context, db *pgxpool.Pool, prodIDs []int) {
+	var rows [][]interface{}
+	base := time.Now().AddDate(-2, 0, 0)
+	for i := 0; i &lt; numInventoryLogs; i++ {
+		rows = append(rows, []interface{}{
+			prodIDs[rand.Intn(len(prodIDs))],
+			rand.Intn(100) - 20,
+			reasons[rand.Intn(len(reasons))],
+			base.Add(randDuration(2*365*24)),
+		})
+	}
+	_, err := db.CopyFrom(ctx, pgx.Identifier{&#34;inventory_log&#34;}, []string{&#34;product_id&#34;, &#34;delta&#34;, &#34;reason&#34;, &#34;created_at&#34;}, pgx.CopyFromRows(rows))
+	must(err)
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+func fetchPrices(ctx context.Context, db *pgxpool.Pool) map[int]float64 {
+	rows, _ := db.Query(ctx, &#34;SELECT id, price FROM products&#34;)
+	defer rows.Close()
+	m := make(map[int]float64)
+	for rows.Next() {
+		var id int
+		var p float64
+		rows.Scan(&amp;id, &amp;p)
+		m[id] = p
+	}
+	return m
+}
+
+func randDuration(hours int) time.Duration {
+	return time.Duration(rand.Intn(hours*3600)) * time.Second
+}
+
+func logProgress(label string, current, total int) {
+	if total == -1 {
+		fmt.Printf(&#34;  [%s] Processed: %d\n&#34;, label, current)
+		return
+	}
+	if current%(total/10) == 0 || current == total {
+		fmt.Printf(&#34;  [%s] %d / %d\n&#34;, label, current, total)
+	}
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+</code></pre>
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

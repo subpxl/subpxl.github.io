@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="View GitHub Repository
+Go Microservices E-commerce Platform A scalable, event-driven E-commerce backend built with Go (Golang), structured around the microservices …"><meta property="og:title" content="microservices-for-beginners"><meta property="og:description" content="View GitHub Repository
+Go Microservices E-commerce Platform A scalable, event-driven E-commerce backend built with Go (Golang), structured around the microservices …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/projects/microservices-for-beginners/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    <span class="badge bg-primary mb-3">Go Cloud</span>
+    
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">microservices-for-beginners</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <p><a href="https://github.com/subpxl/microservices-for-beginners">View GitHub Repository</a></p>
+<h1 id="go-microservices-e-commerce-platform">Go Microservices E-commerce Platform</h1>
+<p>A scalable, event-driven E-commerce backend built with <strong>Go (Golang)</strong>, structured around the microservices architecture. It features an API Gateway for centralized routing, JWT-based authentication, async messaging with RabbitMQ, and a comprehensive OpenTelemetry observability stack.</p>
+<h2 id="-technologies-used">🚀 Technologies Used</h2>
+<ul>
+<li><strong>Languages:</strong> Go (Golang)</li>
+<li><strong>API Gateway &amp; Routing:</strong> <code>go-chi/chi</code></li>
+<li><strong>Messaging / Event Broker:</strong> RabbitMQ</li>
+<li><strong>Databases:</strong> PostgreSQL / SQLite</li>
+<li><strong>Observability:</strong> OpenTelemetry (Otel), Prometheus, Loki, Promtail, Tempo, Grafana</li>
+<li><strong>Deployment:</strong> Docker, Docker Compose, Kubernetes</li>
+</ul>
+<hr>
+<h2 id="-architecture--system-design">🏗️ Architecture &amp; System Design</h2>
+<h3 id="1-total-architecture">1. Total Architecture</h3>
+<p>The system consists of independent microservices handling specific domains. The <strong>API Gateway</strong> acts as the central entry point, routing requests to the respective services.</p>
+<p><img src="images/totalarch.PNG" alt="Total Architecture"></p>
+<h3 id="2-authentication-flow-api-gateway">2. Authentication Flow (API Gateway)</h3>
+<p>We use a centralized authentication approach at the API Gateway level. The gateway validates JWTs internally and forwards the authenticated user&rsquo;s email via the <code>X-User-Email</code> header to internal services.</p>
+<p><img src="images/apigateway%20diagram.PNG" alt="API Gateway Auth"></p>
+<h3 id="3-database-per-service-pattern">3. Database Per Service Pattern</h3>
+<p>To ensure true decoupling and statelessness, each microservice manages its own database. Data consistency across services is maintained eventually using asynchronous event publishing.</p>
+<p><img src="images/dbperservice.PNG" alt="Database Per Service"></p>
+<h3 id="4-asynchronous-messaging-rabbitmq">4. Asynchronous Messaging (RabbitMQ)</h3>
+<p>Synchronous requests are kept to a minimum. For example, when an order is created, the Order Service publishes an <code>OrderCreated</code> event to RabbitMQ, which the Notification Service consumes in the background.</p>
+<p><img src="images/message%20q%20arch.PNG" alt="Message Queue Architecture"></p>
+<h3 id="5-single-microservice-internal-structure">5. Single Microservice Internal Structure</h3>
+<p>Each Go microservice is structured cleanly separating Handlers, Services (Business Logic), and Repositories (Data Access).</p>
+<p><img src="images/single%20microservice%20arch.PNG" alt="Single Microservice Architecture"></p>
+<h3 id="6-observability-stack">6. Observability Stack</h3>
+<p>The platform uses the LGTM stack (Loki, Grafana, Tempo) + Prometheus. Services emit traces, logs, and metrics to the Otel Collector and Promtail, which are visualized in Grafana.</p>
+<p><img src="images/obweercation.PNG" alt="Observability Stack"></p>
+<h3 id="7-kubernetes-deployment">7. Kubernetes Deployment</h3>
+<p>The production deployment utilizes Kubernetes, mapping services to K8s Deployments/Services, databases to StatefulSets, and managing external traffic via an Ingress Controller.</p>
+<p><img src="images/k8s%20draw.PNG" alt="Kubernetes Architecture"></p>
+<hr>
+<h2 id="-how-to-get-started">🚦 How to Get Started</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Docker &amp; Docker Compose</li>
+<li>Go 1.21+ (For local development)</li>
+</ul>
+<h3 id="1-initialize-go-workspace-local-dev">1. Initialize Go Workspace (Local Dev)</h3>
+<p>The project uses Go Workspaces. If not already initialized, run:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>go work init ./authservice ./productservice ./apigateway ./orderservice ./notificationservice ./shared
+</span></span></code></pre></div><h3 id="2-start-the-infrastructure-docker">2. Start the Infrastructure (Docker)</h3>
+<p>Start RabbitMQ and the entire Observability stack (Prometheus, Loki, Tempo, Grafana) using Docker Compose:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker-compose -f docker-compose/docker-compose.yml up -d
+</span></span></code></pre></div><p><em>(Alternatively, navigate to the <code>docker-compose</code> folder and run <code>docker-compose up -d</code>)</em></p>
+<h3 id="3-run-the-microservices">3. Run the Microservices</h3>
+<p>You can run the microservices locally using the provided shell script or start them manually.
+Using the script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./run.sh
+</span></span></code></pre></div><p>Or manually in separate terminals:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Terminal 1: Auth Service (Port 8001)</span>
+</span></span><span style="display:flex;"><span>cd authservice <span style="color:#f92672">&amp;&amp;</span> go run main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Terminal 2: Product Service (Port 8002)</span>
+</span></span><span style="display:flex;"><span>cd productservice <span style="color:#f92672">&amp;&amp;</span> go run main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Terminal 3: Order Service (Port 8003)</span>
+</span></span><span style="display:flex;"><span>cd orderservice <span style="color:#f92672">&amp;&amp;</span> go run main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Terminal 4: Notification Service</span>
+</span></span><span style="display:flex;"><span>cd notificationservice <span style="color:#f92672">&amp;&amp;</span> go run main.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Terminal 5: API Gateway (Port 8000)</span>
+</span></span><span style="display:flex;"><span>cd apigateway <span style="color:#f92672">&amp;&amp;</span> go run main.go
+</span></span></code></pre></div><h3 id="4-testing-the-apis">4. Testing the APIs</h3>
+<p>You can test the entire flow (Auth, Products, and Orders) using the provided Bash script. The script automatically handles hitting the <strong>API Gateway</strong> on <code>http://localhost:8000</code>, authenticating, extracting the JWT token, and using it for protected routes.</p>
+<p>Run the test script from your terminal (Git Bash, WSL, or Linux/macOS):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>bash check_all_curl.sh
+</span></span></code></pre></div><ul>
+<li><strong>Grafana Dashboard:</strong> <code>http://localhost:3000</code></li>
+<li><strong>RabbitMQ UI:</strong> <code>http://localhost:15672</code> (guest / guest)</li>
+</ul>
+
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

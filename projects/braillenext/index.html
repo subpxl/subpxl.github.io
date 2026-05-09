@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="View GitHub Repository
+Braillenext Braillenext is an open-source project aimed at creating an assistive device for the visually impaired. This device uses a combination …"><meta property="og:title" content="braillenext"><meta property="og:description" content="View GitHub Repository
+Braillenext Braillenext is an open-source project aimed at creating an assistive device for the visually impaired. This device uses a combination …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/projects/braillenext/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    <span class="badge bg-primary mb-3">AI</span>
+    
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">braillenext</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <p><a href="https://github.com/subpxl/braillenext">View GitHub Repository</a></p>
+<h1 id="braillenext">Braillenext</h1>
+<p><a href="https://braillenext.web.app/">Braillenext</a> is an open-source project aimed at creating an assistive device for the visually impaired. This device uses a combination of Raspberry Pi, Arduino, and various sensors to detect text and objects, converting them into tactile feedback.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#hardware-requirements">Hardware Requirements</a></li>
+<li><a href="#assembly-instructions">Assembly Instructions</a></li>
+<li><a href="#software-setup">Software Setup</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#development">Development</a></li>
+</ol>
+<h2 id="hardware-requirements">Hardware Requirements</h2>
+<ul>
+<li>Raspberry Pi Zero</li>
+<li>Arduino Nano</li>
+<li>LiDAR sensor</li>
+<li>Pi Camera</li>
+<li>Acrylic sheet (4 or 5mm)</li>
+<li>Strong adhesive</li>
+<li>Other electronic components as specified in the schematics</li>
+<li>Power supply (battery)</li>
+</ul>
+<h2 id="assembly-instructions">Assembly Instructions</h2>
+<h3 id="mechanical-assembly">Mechanical Assembly</h3>
+<ol>
+<li>Use CorelDRAW and a laser cutter to cut the acrylic sheets according to the provided drawings.</li>
+<li>Assemble the cut parts as shown in the reference images.</li>
+</ol>
+<h3 id="electronic-assembly">Electronic Assembly</h3>
+<ol>
+<li>Wire the Arduino Nano components according to the schematics.</li>
+<li>Connect the Raspberry Pi Zero components as per the provided diagrams.</li>
+<li>Set up a common power supply for both the Arduino and Raspberry Pi.</li>
+</ol>
+<h2 id="software-setup">Software Setup</h2>
+<h3 id="arduino-setup">Arduino Setup</h3>
+<ol>
+<li>Connect the Arduino Nano to your PC.</li>
+<li>Use the Arduino IDE to upload the LiDAR code to the Arduino Nano.</li>
+<li>Test the Arduino setup (LiDAR and vibrating coin motor).</li>
+</ol>
+<h3 id="raspberry-pi-setup">Raspberry Pi Setup</h3>
+<ol>
+<li>
+<p>Burn Raspberry Pi OS onto an SD card for the Raspberry Pi Zero.</p>
+</li>
+<li>
+<p>Set up WiFi and SSH access.</p>
+</li>
+<li>
+<p>SSH into the Raspberry Pi.</p>
+</li>
+<li>
+<p>Update the device and install required packages:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo apt-get update <span style="color:#f92672">&amp;&amp;</span> sudo apt-get upgrade
+</span></span><span style="display:flex;"><span>sudo apt-get install python3-pip
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Install other required packages</span>
+</span></span></code></pre></div></li>
+<li>
+<p>Create a base folder for Braillenext.</p>
+</li>
+<li>
+<p>Test the Raspberry Pi camera.</p>
+</li>
+<li>
+<p>Run all installation commands as specified in the setup guide.</p>
+</li>
+<li>
+<p>Test the Raspberry Pi Bluetooth connection with a phone.</p>
+</li>
+<li>
+<p>Upload the Python code.</p>
+</li>
+<li>
+<p>Test all components:</p>
+<ul>
+<li>Camera functionality</li>
+<li>Bluetooth connectivity</li>
+<li>Google Cloud Vision API integration</li>
+<li>Android app connectivity</li>
+</ul>
+</li>
+</ol>
+<h2 id="android-app-setup">Android App Setup</h2>
+<pre><code>1. Install the Android app on a supported device.
+2. If the app is not available, build a new one from the .aia file using MIT App Inventor 2.
+</code></pre>
+<h2 id="usage">Usage</h2>
+<pre><code>1. Open the Android app.
+2. Connect the app to the Raspberry Pi Zero via Bluetooth.
+3. Point the device at text or an object.
+4. Press the appropriate button (text or object) on the right side of the app.
+</code></pre>
+<h2 id="development">Development</h2>
+<pre><code>The current active branch is devs. Please use this branch for testing before merging.
+</code></pre>
+<h2 id="cloning-the-repository">Cloning the Repository</h2>
+<pre><code>git clone git@github.com:subpxl/braillenext.git
+</code></pre>
+<h2 id="bluetooth-connection">Bluetooth Connection</h2>
+<pre><code>To connect with Bluetooth:
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo bluetoothctl
+</span></span><span style="display:flex;"><span>agent on
+</span></span><span style="display:flex;"><span>default-agent
+</span></span><span style="display:flex;"><span>scan on
+</span></span><span style="display:flex;"><span>pair <span style="color:#f92672">[</span>device_mac_address<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>connect <span style="color:#f92672">[</span>device_mac_address<span style="color:#f92672">]</span>    
+</span></span></code></pre></div><h2 id="serial-communication">Serial Communication</h2>
+<pre><code>- To send data via serial from the Raspberry Pi:
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;Hello&#34;</span> &gt; /dev/rfcomm0
+</span></span></code></pre></div><pre><code>- To read from serial:
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /dev/rfcomm0
+</span></span></code></pre></div><pre><code>- To read and send a text file:
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>&lt;speech_test.txt<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> &gt; /dev/rfcomm0
+</span></span></code></pre></div><h2 id="additional-resources">Additional Resources</h2>
+<pre><code>- LiDAR Arduino Library
+- MIT App Inventor 2
+- Braillenext App Project
+</code></pre>
+<h2 id="contributing">Contributing</h2>
+<pre><code>the project is open for any contributions and updates
+</code></pre>
+
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

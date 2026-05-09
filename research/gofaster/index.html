@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Gofaster.
+File: main.go package mainimport ( …"><meta property="og:title" content="Gofaster"><meta property="og:description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Gofaster.
+File: main.go package mainimport ( …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/research/gofaster/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    
+    <span class="badge bg-secondary mb-3">Deep Dive</span>
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">Gofaster</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <h2 id="research--code-notes">Research &amp; Code Notes</h2>
+<p>This document contains text-heavy extracts and code snippets from my research on Gofaster.</p>
+<h3 id="file-maingo">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+    &#34;inventory/controllers&#34;
+    &#34;inventory/models&#34;
+
+    &#34;github.com/gin-gonic/gin&#34;
+    &#34;gorm.io/driver/sqlite&#34;
+    &#34;gorm.io/gorm&#34;
+)
+
+func main() {
+    db, err := gorm.Open(sqlite.Open(&#34;inventory.db&#34;), &amp;gorm.Config{})
+    if err != nil {
+        panic(err)
+    }
+
+    db.AutoMigrate(&amp;models.Product{})
+
+    r := gin.Default()
+
+    pc := controllers.NewProductController(db)
+
+    r.GET(&#34;/&#34;, pc.Index)
+    r.GET(&#34;/products/new&#34;, pc.New)
+    r.POST(&#34;/products&#34;, pc.Create)
+    r.GET(&#34;/products/:id/edit&#34;, pc.Edit)
+    r.POST(&#34;/products/:id&#34;, pc.Update)
+    r.POST(&#34;/products/:id/delete&#34;, pc.Delete)
+
+    r.Run(&#34;:8080&#34;)
+}
+</code></pre><h3 id="file-product_controllergo">File: product_controller.go</h3>
+<pre tabindex="0"><code>package controllers
+
+import (
+	&#34;inventory/models&#34;
+	&#34;inventory/views&#34;
+	&#34;net/http&#34;
+	&#34;strconv&#34;
+
+	&#34;github.com/gin-gonic/gin&#34;
+	&#34;gorm.io/gorm&#34;
+)
+
+type ProductController struct {
+	db *gorm.DB
+}
+
+func NewProductController(db *gorm.DB) *ProductController {
+	return &amp;ProductController{db: db}
+}
+
+func (pc *ProductController) Index(c *gin.Context) {
+	var products []models.Product
+	pc.db.Find(&amp;products)
+	views.ProductsIndex(products).Render(c.Request.Context(), c.Writer)
+}
+
+func (pc *ProductController) New(c *gin.Context) {
+	views.ProductsForm(models.Product{}, &#34;/products&#34;).Render(c.Request.Context(), c.Writer)
+}
+
+func (pc *ProductController) Create(c *gin.Context) {
+	qty, _ := strconv.Atoi(c.PostForm(&#34;quantity&#34;))
+	price, _ := strconv.ParseFloat(c.PostForm(&#34;price&#34;), 64)
+
+	p := models.Product{
+		Name:     c.PostForm(&#34;name&#34;),
+		Quantity: qty,
+		Price:    price,
+	}
+
+	pc.db.Create(&amp;p)
+	c.Redirect(http.StatusSeeOther, &#34;/&#34;)
+}
+
+func (pc *ProductController) Edit(c *gin.Context) {
+	var product models.Product
+	pc.db.First(&amp;product, c.Param(&#34;id&#34;))
+	views.ProductsForm(product, &#34;/products/&#34;+c.Param(&#34;id&#34;)).Render(c.Request.Context(), c.Writer)
+}
+
+func (pc *ProductController) Update(c *gin.Context) {
+	var product models.Product
+	pc.db.First(&amp;product, c.Param(&#34;id&#34;))
+
+	product.Name = c.PostForm(&#34;name&#34;)
+	product.Quantity, _ = strconv.Atoi(c.PostForm(&#34;quantity&#34;))
+	product.Price, _ = strconv.ParseFloat(c.PostForm(&#34;price&#34;), 64)
+
+	pc.db.Save(&amp;product)
+	c.Redirect(http.StatusSeeOther, &#34;/&#34;)
+}
+
+func (pc *ProductController) Delete(c *gin.Context) {
+	pc.db.Delete(&amp;models.Product{}, c.Param(&#34;id&#34;))
+	c.Redirect(http.StatusSeeOther, &#34;/&#34;)
+}
+</code></pre><h3 id="file-productgo">File: product.go</h3>
+<pre tabindex="0"><code>package models
+
+import &#34;gorm.io/gorm&#34;
+
+type Product struct {
+    gorm.Model
+    Name     string
+    Quantity int
+    Price    float64
+}
+</code></pre><h3 id="file-layout_templgo">File: layout_templ.go</h3>
+<pre tabindex="0"><code>// Code generated by templ - DO NOT EDIT.
+
+// templ: version: v0.3.977
+package views
+
+//lint:file-ignore SA4006 This context is only used if a nested component is present.
+
+import &#34;github.com/a-h/templ&#34;
+import templruntime &#34;github.com/a-h/templ/runtime&#34;
+
+func Layout(title string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var1 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var1 == nil {
+			templ_7745c5c3_Var1 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, &#34;&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=\&#34;UTF-8\&#34;&gt;&lt;title&gt;&#34;)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout.templ`, Line: 8, Col: 21}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, &#34;&lt;/title&gt;&lt;link href=\&#34;https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\&#34; rel=\&#34;stylesheet\&#34;&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=\&#34;container mt-4\&#34;&gt;&#34;)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ_7745c5c3_Var1.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, &#34;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;&#34;)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+var _ = templruntime.GeneratedTemplate
+</code></pre><h3 id="file-products_form_templgo">File: products_form_templ.go</h3>
+<pre tabindex="0"><code>// Code generated by templ - DO NOT EDIT.
+
+// templ: version: v0.3.977
+package views
+
+//lint:file-ignore SA4006 This context is only used if a nested component is present.
+
+import &#34;github.com/a-h/templ&#34;
+import templruntime &#34;github.com/a-h/templ/runtime&#34;
+
+import &#34;inventory/models&#34;
+
+func ProductsForm(p models.Product, action string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var1 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var1 == nil {
+			templ_7745c5c3_Var1 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, &#34;&lt;h2 class=\&#34;mb-3\&#34;&gt;Product&lt;/h2&gt;&lt;form method=\&#34;POST\&#34; action=\&#34;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 templ.SafeURL
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(action)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_form.templ`, Line: 8, Col: 42}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, &#34;\&#34;&gt;&lt;div class=\&#34;mb-3\&#34;&gt;&lt;label class=\&#34;form-label\&#34;&gt;Name&lt;/label&gt; &lt;input name=\&#34;name\&#34; class=\&#34;form-control\&#34; value=\&#34;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_form.templ`, Line: 11, Col: 69}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, &#34;\&#34; required&gt;&lt;/div&gt;&lt;div class=\&#34;mb-3\&#34;&gt;&lt;label class=\&#34;form-label\&#34;&gt;Quantity&lt;/label&gt; &lt;input type=\&#34;number\&#34; name=\&#34;quantity\&#34; class=\&#34;form-control\&#34; value=\&#34;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Quantity)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_form.templ`, Line: 16, Col: 91}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, &#34;\&#34;&gt;&lt;/div&gt;&lt;div class=\&#34;mb-3\&#34;&gt;&lt;label class=\&#34;form-label\&#34;&gt;Price&lt;/label&gt; &lt;input type=\&#34;number\&#34; step=\&#34;0.01\&#34; name=\&#34;price\&#34; class=\&#34;form-control\&#34; value=\&#34;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.Price)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_form.templ`, Line: 21, Col: 97}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, &#34;\&#34;&gt;&lt;/div&gt;&lt;button class=\&#34;btn btn-success\&#34;&gt;Save&lt;/button&gt; &lt;a href=\&#34;/\&#34; class=\&#34;btn btn-secondary\&#34;&gt;Cancel&lt;/a&gt;&lt;/form&gt;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = Layout(&#34;Product Form&#34;).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+var _ = templruntime.GeneratedTemplate
+</code></pre><h3 id="file-products_index_templgo">File: products_index_templ.go</h3>
+<pre tabindex="0"><code>// Code generated by templ - DO NOT EDIT.
+
+// templ: version: v0.3.977
+package views
+
+//lint:file-ignore SA4006 This context is only used if a nested component is present.
+
+import &#34;github.com/a-h/templ&#34;
+import templruntime &#34;github.com/a-h/templ/runtime&#34;
+
+import (
+	&#34;inventory/models&#34;
+	&#34;strconv&#34;
+)
+
+func ProductsIndex(products []models.Product) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var1 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var1 == nil {
+			templ_7745c5c3_Var1 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, &#34;&lt;div class=\&#34;d-flex justify-content-between mb-3\&#34;&gt;&lt;h2&gt;Product Inventory&lt;/h2&gt;&lt;a href=\&#34;/products/new\&#34; class=\&#34;btn btn-primary\&#34;&gt;New Product&lt;/a&gt;&lt;/div&gt;&lt;table class=\&#34;table table-bordered\&#34;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Quantity&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;&lt;th&gt;Actions&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt; &lt;tbody&gt;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, p := range products {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, &#34;&lt;tr&gt;&lt;td&gt;&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_index.templ`, Line: 27, Col: 35}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, &#34;&lt;/td&gt;&lt;td&gt;&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.Quantity)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_index.templ`, Line: 28, Col: 39}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, &#34;&lt;/td&gt;&lt;td&gt;$&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Price)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_index.templ`, Line: 29, Col: 37}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, &#34;&lt;/td&gt;&lt;td&gt;&lt;a href=\&#34;&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 templ.SafeURL
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(&#34;/products/&#34; + templ.URL(strconv.FormatUint(uint64(p.ID), 10)) + &#34;/edit&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_index.templ`, Line: 31, Col: 109}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, &#34;\&#34; class=\&#34;btn btn-sm btn-warning\&#34;&gt;Edit&lt;/a&gt;&lt;form method=\&#34;POST\&#34; action=\&#34;&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 templ.SafeURL
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(&#34;/products/&#34; + templ.URL(strconv.FormatUint(uint64(p.ID), 10)) + &#34;/delete&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/products_index.templ`, Line: 32, Col: 130}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, &#34;\&#34; class=\&#34;d-inline\&#34;&gt;&lt;button class=\&#34;btn btn-sm btn-danger\&#34;&gt;Delete&lt;/button&gt;&lt;/form&gt;&lt;/td&gt;&lt;/tr&gt;&#34;)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, &#34;&lt;/tbody&gt;&lt;/table&gt;&#34;)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = Layout(&#34;Products&#34;).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+var _ = templruntime.GeneratedTemplate
+</code></pre>
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

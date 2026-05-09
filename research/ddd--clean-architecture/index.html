@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Ddd Clean Architecture.
+File: Untitled-1.ini project-root/├── …"><meta property="og:title" content="Ddd  Clean Architecture"><meta property="og:description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Ddd Clean Architecture.
+File: Untitled-1.ini project-root/├── …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/research/ddd--clean-architecture/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    
+    <span class="badge bg-secondary mb-3">Deep Dive</span>
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">Ddd  Clean Architecture</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <h2 id="research--code-notes">Research &amp; Code Notes</h2>
+<p>This document contains text-heavy extracts and code snippets from my research on Ddd  Clean Architecture.</p>
+<h3 id="file-untitled-1ini">File: Untitled-1.ini</h3>
+<pre tabindex="0"><code>project-root/
+├── build/                      # Build scripts and Dockerfiles
+│   ├── auth/
+│   ├── calculator/
+│   └── analytics/
+├── cmd/                        # Entry points
+│   ├── monolith/              # Single binary setup
+│   │   └── main.go
+│   └── services/              # Individual service binaries
+│       ├── auth/
+│       ├── calculator/
+│       └── analytics/
+├── configs/                    # Configuration templates
+│   ├── templates/
+│   │   ├── auth.yaml
+│   │   ├── calculator.yaml
+│   │   └── analytics.yaml
+│   └── examples/              # Example configs for different use cases
+│       ├── rest-auth-calc/
+│       ├── cli-calc-notify/
+│       └── blog-template-auth/
+├── internal/                   # Private application code
+│   ├── platform/              # Shared internal platform code
+│   │   ├── database/
+│   │   ├── cache/
+│   │   ├── messagequeue/
+│   │   └── metrics/
+│   └── worker/               # Background workers
+│       ├── crawler/
+│       └── processor/
+├── pkg/                       # Public shared packages
+│   ├── auth/                 # Auth service
+│   │   ├── domain/
+│   │   ├── oauth/
+│   │   ├── cookie/
+│   │   └── jwt/
+│   ├── calculator/          # Calculator service
+│   │   ├── domain/
+│   │   ├── operations/
+│   │   └── history/
+│   ├── analytics/          # Analytics service
+│   │   ├── domain/
+│   │   ├── collector/
+│   │   └── reporter/
+│   └── common/             # Shared utilities
+│       ├── config/
+│       ├── logger/
+│       ├── errors/
+│       └── middleware/
+├── proto/                  # Protocol buffer definitions
+│   ├── auth/
+│   ├── calculator/
+│   └── analytics/
+├── ui/                    # Frontend code
+│   ├── templates/         # HTML templates
+│   ├── static/           # Static assets
+│   └── web/              # Web components
+├── scripts/              # Utility scripts
+├── api/                  # API documentation
+│   └── openapi/
+├── deployments/          # Deployment configurations
+│   ├── docker/
+│   └── kubernetes/
+├── go.mod
+├── go.sum
+└── Makefile
+</code></pre><h3 id="file-maingo">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;calculator-app/Usecase/calculation&#34;
+	&#34;calculator-app/Usecase/calculationwithanalytics&#34;
+	&#34;calculator-app/config&#34;
+	&#34;calculator-app/domain/calculator&#34;
+	&#34;calculator-app/infrastructure/database&#34;
+	analyticsRepo &#34;calculator-app/infrastructure/repository/analytics&#34;
+	&#34;log&#34;
+
+	&#34;gorm.io/gorm&#34;
+)
+
+type DBType string
+
+const (
+	PostgreSQL DBType = &#34;postgres&#34;
+	SQLite     DBType = &#34;sqlite&#34;
+)
+
+func initDB(config *config.Config) (*gorm.DB, error) {
+	switch config.Database.Type {
+	case &#34;postgres&#34;:
+		return database.NewPostgresConnection(
+			config.Database.Host,
+			config.Database.Port,
+			config.Database.User,
+			config.Database.Password,
+			config.Database.DBName,
+		)
+	case &#34;sqlite&#34;:
+		return database.NewSQLiteConnection(config.Database.SQLitePath)
+	default:
+		return database.NewSQLiteConnection(config.Database.SQLitePath)
+	}
+}
+
+func main() {
+	cfg := config.NewConfig()
+
+	// Initialize database connection
+	db, err := initDB(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// initiate repositories
+	analyticsRepository, err := analyticsRepo.NewGormRepository(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// initiate calculator
+	calc := calculator.NewCalculator() // This returns *Calculator
+
+	// initialize usecases
+	calculateWithAnalytics := calculationwithanalytics.New(analyticsRepository, calc)
+	calculateUseCase := calculation.New(calc)
+
+	// use plain calculator
+	result1, err := calculateUseCase.Add(1, 2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf(&#34;Plain calculation result: %f\n&#34;, result1)
+	result, err := calculateWithAnalytics.AddWithAnalytics(1, 2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf(&#34;Result: %f\n&#34;, result)
+}
+</code></pre><h3 id="file-configgo">File: config.go</h3>
+<pre tabindex="0"><code>// config/config.go
+package config
+
+type DBConfig struct {
+    Type     string
+    Host     string
+    Port     int
+    User     string
+    Password string
+    DBName   string
+    SQLitePath string
+}
+
+type Config struct {
+    Database DBConfig
+}
+
+func NewConfig() *Config {
+    return &amp;Config{
+        Database: DBConfig{
+            Type:       &#34;sqlite&#34;, // or &#34;postgres&#34;
+            Host:       &#34;localhost&#34;,
+            Port:       5432,
+            User:       &#34;postgres&#34;,
+            Password:   &#34;password&#34;,
+            DBName:     &#34;calculator_db&#34;,
+            SQLitePath: &#34;calculator.db&#34;,
+        },
+    }
+}
+</code></pre><h3 id="file-interfacesgo">File: interfaces.go</h3>
+<pre tabindex="0"><code>package analytics
+
+type Repository interface {
+	CreateRecord(calculationRecord CalculationRecord) error
+	ListRecord() ([]CalculationRecord, error)
+}
+</code></pre><h3 id="file-recordsgo">File: records.go</h3>
+<pre tabindex="0"><code>package analytics
+
+import &#34;time&#34;
+
+type CalculationRecord struct {
+	ID        string
+	Operation string
+	Input     string
+	Output    string
+	TimeStamp time.Time
+}
+</code></pre><h3 id="file-calculatorgo">File: calculator.go</h3>
+<pre tabindex="0"><code>package calculator
+
+import &#34;errors&#34;
+
+var (
+	ErrDivideByZero = errors.New(&#34;cannot divide by zero&#34;)
+)
+
+type Input struct {
+	X float64
+	Y float64
+}
+
+type Result struct {
+	Value float64
+}
+
+type Calculator struct {
+}
+
+func NewCalculator() *Calculator {
+    return &amp;Calculator{}
+}
+
+
+func (c *Calculator) Add(input Input) (Result, error) {
+	return Result{input.X + input.Y}, nil
+}
+
+func (c *Calculator) Subtract(input Input) (Result, error) {
+	return Result{input.X - input.Y}, nil
+
+}
+
+func (c *Calculator) Multiply(input Input) (Result, error) {
+	return Result{input.X * input.Y}, nil
+}
+
+func (c *Calculator) Divide(input Input) (Result, error) {
+	if input.Y == 0 {
+		return Result{}, ErrDivideByZero
+	}
+	return Result{input.X / input.Y}, nil
+}
+
+func (c *Calculator) Remainder(input Input) (Result, error) {
+	if input.Y == 0 {
+		return Result{}, ErrDivideByZero
+	}
+	return Result{Value: float64(int(input.X) % int(input.Y))}, nil
+}
+
+func (c *Calculator) Quotient(input Input) (Result, error) {
+	if input.Y == 0 {
+		return Result{}, ErrDivideByZero
+	}
+	return Result{Value: float64(int(input.X) / int(input.Y))}, nil
+}
+</code></pre><h3 id="file-interfacesgo-1">File: interfaces.go</h3>
+<pre tabindex="0"><code>package calculator
+
+type SimpleCalculator interface {
+	Add(input Input) (*Result, error)
+	Subtract(input Input) (*Result, error)
+	Multiply(input Input) (*Result, error)
+	Divide(input Input) (*Result, error)
+}
+
+type AdvanceCalculator interface {
+	SimpleCalculator
+	Reminder(input Input) (*Result, error)
+	Quotent(input Input) (*Result, error)
+}
+</code></pre><h3 id="file-postgresgo">File: postgres.go</h3>
+<pre tabindex="0"><code>package database
+
+import (
+	&#34;fmt&#34;
+
+	&#34;gorm.io/driver/postgres&#34;
+
+	&#34;gorm.io/gorm&#34;
+)
+
+func NewPostgresConnection(host string,
+	port int,
+	user string,
+	password string,
+	dbname string) (*gorm.DB, error) {
+	dsn := fmt.Sprintf(
+		&#34;host=%s user=%s password=%s dbname=%s port=%d sslmode=disable&#34;,
+		host, user, password, dbname, port,
+	)
+
+	return gorm.Open(postgres.Open(dsn), &amp;gorm.Config{})
+}
+</code></pre><h3 id="file-sqlitego">File: sqlite.go</h3>
+<pre tabindex="0"><code>// infrastructure/database/sqlite.go
+package database
+
+import (
+    &#34;gorm.io/driver/sqlite&#34;
+    &#34;gorm.io/gorm&#34;
+)
+
+func NewSQLiteConnection(dbPath string) (*gorm.DB, error) {
+    return gorm.Open(sqlite.Open(dbPath), &amp;gorm.Config{})
+}
+</code></pre><h3 id="file-gorm_repositorygo">File: gorm_repository.go</h3>
+<pre tabindex="0"><code>package analytics
+
+import (
+	&#34;calculator-app/domain/analytics&#34;
+
+	&#34;gorm.io/gorm&#34;
+)
+
+type GormRepository struct {
+	db *gorm.DB
+}
+
+func NewGormRepository(db *gorm.DB) (*GormRepository, error) {
+	err := db.AutoMigrate(&amp;analytics.CalculationRecord{})
+	if err != nil {
+		return nil, err
+	}
+	return &amp;GormRepository{db}, nil
+}
+
+func (r *GormRepository) CreateRecord(calculationRecord analytics.CalculationRecord) error {
+	return r.db.Create(&amp;calculationRecord).Error
+}
+
+func (r *GormRepository) ListRecord() ([]analytics.CalculationRecord, error) {
+	var records []analytics.CalculationRecord
+	err := r.db.Find(&amp;records).Error
+	return records, err
+}
+</code></pre><h3 id="file-interfacesgo-2">File: interfaces.go</h3>
+<pre tabindex="0"><code>package usecase
+
+type CalculatorUseCase interface {
+	Add(x, y float64) (float64, error)
+	Subtract(x, y float64) (float64, error)
+	Multiply(x, y float64) (float64, error)
+	Divide(x, y float64) (float64, error)
+}
+
+type CalculatorWithAnalyticsUseCase interface {
+	AddWithAnalytics(x, y float64) (float64, error)
+	SubtractWithAnalytics(x, y float64) (float64, error)
+	MultiplyWithAnalytics(x, y float64) (float64, error)
+	DivideWithAnalytics(x, y float64) (float64, error)
+}
+</code></pre><h3 id="file-calculationgo">File: calculation.go</h3>
+<pre tabindex="0"><code>// usecase/calculation/calculation.go
+package calculation
+
+import &#34;calculator-app/domain/calculator&#34;
+
+type calculation struct {
+    calc *calculator.Calculator
+}
+
+func New(calc *calculator.Calculator) UseCase {
+    return &amp;calculation{
+        calc: calc,
+    }
+}
+
+func (c *calculation) Add(x, y float64) (float64, error) {
+    input := calculator.Input{
+        X: x,
+        Y: y,
+    }
+    result, err := c.calc.Add(input)
+    if err != nil {
+        return 0, err
+    }
+    return result.Value, nil
+}
+
+func (c *calculation) Subtract(x, y float64) (float64, error) {
+    input := calculator.Input{
+        X: x,
+        Y: y,
+    }
+    result, err := c.calc.Subtract(input)
+    if err != nil {
+        return 0, err
+    }
+    return result.Value, nil
+}
+
+func (c *calculation) Multiply(x, y float64) (float64, error) {
+    input := calculator.Input{
+        X: x,
+        Y: y,
+    }
+    result, err := c.calc.Multiply(input)
+    if err != nil {
+        return 0, err
+    }
+    return result.Value, nil
+}
+
+func (c *calculation) Divide(x, y float64) (float64, error) {
+    input := calculator.Input{
+        X: x,
+        Y: y,
+    }
+    result, err := c.calc.Divide(input)
+    if err != nil {
+        return 0, err
+    }
+    return result.Value, nil
+}
+</code></pre><h3 id="file-interfacesgo-3">File: interfaces.go</h3>
+<pre tabindex="0"><code>// usecase/calculation/interfaces.go
+package calculation
+
+type UseCase interface {
+    Add(x, y float64) (float64, error)
+    Subtract(x, y float64) (float64, error)
+    Multiply(x, y float64) (float64, error)
+    Divide(x, y float64) (float64, error)
+}
+</code></pre><h3 id="file-calculationwithanalyticsgo">File: calculationwithanalytics.go</h3>
+<pre tabindex="0"><code>// usecase/calculationwithanalytics/calculationwithanalytics.go
+package calculationwithanalytics
+
+import (
+	&#34;calculator-app/usecase&#34; // Add this import
+
+	&#34;calculator-app/domain/analytics&#34;
+	&#34;calculator-app/domain/calculator&#34;
+	&#34;encoding/json&#34;
+	&#34;time&#34;
+
+	&#34;github.com/google/uuid&#34;
+)
+
+type calculationwithanalytics struct {
+	repo analytics.Repository
+	calc *calculator.Calculator
+}
+
+func New(repo analytics.Repository, calc *calculator.Calculator) usecase.CalculatorWithAnalyticsUseCase {
+	return &amp;calculationwithanalytics{
+		repo: repo,
+		calc: calc,
+	}
+}
+
+func (c *calculationwithanalytics) AddWithAnalytics(x, y float64) (float64, error) {
+	input := calculator.Input{
+		X: x,
+		Y: y,
+	}
+	result, err := c.calc.Add(input)
+	if err != nil {
+		return 0, err
+	}
+
+	inputJSON, _ := json.Marshal(input)
+	outputJSON, _ := json.Marshal(result)
+
+	record := analytics.CalculationRecord{
+		ID:        uuid.New().String(),
+		Operation: &#34;ADD&#34;,
+		Input:     string(inputJSON),
+		Output:    string(outputJSON),
+		TimeStamp: time.Now(),
+	}
+
+	if err := c.repo.CreateRecord(record); err != nil {
+		return 0, err
+	}
+	return result.Value, nil
+}
+
+func (c *calculationwithanalytics) SubtractWithAnalytics(x, y float64) (float64, error) {
+	input := calculator.Input{
+		X: x,
+		Y: y,
+	}
+	result, err := c.calc.Subtract(input)
+	if err != nil {
+		return 0, err
+	}
+
+	inputJSON, _ := json.Marshal(input)
+	outputJSON, _ := json.Marshal(result)
+
+	record := analytics.CalculationRecord{
+		ID:        uuid.New().String(),
+		Operation: &#34;SUBTRACT&#34;,
+		Input:     string(inputJSON),
+		Output:    string(outputJSON),
+		TimeStamp: time.Now(),
+	}
+
+	if err := c.repo.CreateRecord(record); err != nil {
+		return 0, err
+	}
+	return result.Value, nil
+}
+
+func (c *calculationwithanalytics) MultiplyWithAnalytics(x, y float64) (float64, error) {
+	input := calculator.Input{
+		X: x,
+		Y: y,
+	}
+	result, err := c.calc.Multiply(input)
+	if err != nil {
+		return 0, err
+	}
+
+	inputJSON, _ := json.Marshal(input)
+	outputJSON, _ := json.Marshal(result)
+
+	record := analytics.CalculationRecord{
+		ID:        uuid.New().String(),
+		Operation: &#34;MULTIPLY&#34;,
+		Input:     string(inputJSON),
+		Output:    string(outputJSON),
+		TimeStamp: time.Now(),
+	}
+
+	if err := c.repo.CreateRecord(record); err != nil {
+		return 0, err
+	}
+	return result.Value, nil
+}
+
+func (c *calculationwithanalytics) DivideWithAnalytics(x, y float64) (float64, error) {
+	input := calculator.Input{
+		X: x,
+		Y: y,
+	}
+	result, err := c.calc.Divide(input)
+	if err != nil {
+		return 0, err
+	}
+
+	inputJSON, _ := json.Marshal(input)
+	outputJSON, _ := json.Marshal(result)
+
+	record := analytics.CalculationRecord{
+		ID:        uuid.New().String(),
+		Operation: &#34;DIVIDE&#34;,
+		Input:     string(inputJSON),
+		Output:    string(outputJSON),
+		TimeStamp: time.Now(),
+	}
+
+	if err := c.repo.CreateRecord(record); err != nil {
+		return 0, err
+	}
+	return result.Value, nil
+}
+</code></pre>
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

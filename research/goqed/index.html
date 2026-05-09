@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Goqed.
+File: main.go package mainimport (&#34;fmt&#34;htmltemplate …"><meta property="og:title" content="Goqed"><meta property="og:description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Goqed.
+File: main.go package mainimport (&#34;fmt&#34;htmltemplate …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/research/goqed/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    
+    <span class="badge bg-secondary mb-3">Deep Dive</span>
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">Goqed</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <h2 id="research--code-notes">Research &amp; Code Notes</h2>
+<p>This document contains text-heavy extracts and code snippets from my research on Goqed.</p>
+<h3 id="file-maingo">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	htmltemplate &#34;html/template&#34;
+	&#34;log&#34;
+	&#34;net&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+	&#34;os/exec&#34;
+	&#34;os/signal&#34;
+	&#34;strings&#34;
+	&#34;sync&#34;
+	&#34;syscall&#34;
+	&#34;time&#34;
+
+	&#34;github.com/grandcat/zeroconf&#34;
+	qrcode &#34;github.com/skip2/go-qrcode&#34;
+)
+
+// ── thread-safe post store ────────────────────────────────────────────────────
+
+var (
+	mu    sync.RWMutex
+	posts []string
+)
+
+func CheckLANAccess() {
+	fmt.Println(&#34;== LAN access check ==&#34;)
+
+	// 1. Check if port 8080 is listening
+	conn, err := net.DialTimeout(&#34;tcp&#34;, &#34;127.0.0.1:8080&#34;, time.Second)
+	if err != nil {
+		fmt.Println(&#34;FAIL: server not listening on :8080&#34;)
+		return
+	}
+	conn.Close()
+	fmt.Println(&#34;OK  : server listening on :8080&#34;)
+
+	// 2. Check Windows network profile (PowerShell)
+	out, err := exec.Command(
+		&#34;powershell&#34;,
+		&#34;-Command&#34;,
+		&#34;(Get-NetConnectionProfile).NetworkCategory&#34;,
+	).Output()
+	if err != nil || !strings.Contains(string(out), &#34;Private&#34;) {
+		fmt.Println(&#34;FAIL: network profile is not Private&#34;)
+		return
+	}
+	fmt.Println(&#34;OK  : network profile is Private&#34;)
+
+	// 3. Check firewall rule exists and is enabled
+	out, err = exec.Command(
+		&#34;powershell&#34;,
+		&#34;-Command&#34;,
+		&#34;Get-NetFirewallRule -DisplayName &#39;Local Blog :8080&#39; | Select -Expand Enabled&#34;,
+	).Output()
+	if err != nil || !strings.Contains(string(out), &#34;True&#34;) {
+		fmt.Println(&#34;FAIL: firewall rule missing or disabled&#34;)
+		return
+	}
+	fmt.Println(&#34;OK  : firewall rule enabled&#34;)
+
+	fmt.Println(&#34;PASS: LAN access should work&#34;)
+}
+
+// ── template (parsed once at startup) ────────────────────────────────────────
+
+var tmpl = htmltemplate.Must(htmltemplate.New(&#34;page&#34;).Parse(`&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset=&#34;UTF-8&#34;&gt;
+  &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width,initial-scale=1&#34;&gt;
+  &lt;title&gt;Local Blog&lt;/title&gt;
+  &lt;style&gt;
+    body{font-family:system-ui,sans-serif;max-width:650px;margin:2rem auto;padding:0 1rem}
+    textarea{width:100%;box-sizing:border-box}
+    .qr{float:right;text-align:center;font-size:.8rem}
+    .qr img{display:block;width:150px;height:150px}
+    li{margin:.5rem 0;white-space:pre-wrap}
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=&#34;qr&#34;&gt;
+    &lt;img src=&#34;/qr&#34; alt=&#34;QR Code&#34;&gt;
+    scan on same Wi-Fi
+  &lt;/div&gt;
+  &lt;h1&gt;📖 Local Blog&lt;/h1&gt;
+  &lt;p&gt;URL: &lt;a href=&#34;{{.URL}}&#34;&gt;{{.URL}}&lt;/a&gt;&lt;/p&gt;
+  &lt;h2&gt;New post&lt;/h2&gt;
+  &lt;form method=&#34;POST&#34;&gt;
+    &lt;textarea name=&#34;content&#34; rows=&#34;5&#34; placeholder=&#34;Write something…&#34;&gt;&lt;/textarea&gt;&lt;br&gt;&lt;br&gt;
+    &lt;button&gt;Publish&lt;/button&gt;
+  &lt;/form&gt;
+  &lt;h2&gt;Posts ({{len .Posts}})&lt;/h2&gt;
+  &lt;ul&gt;
+    {{range .Posts}}&lt;li&gt;{{.}}&lt;/li&gt;{{end}}
+  &lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;`))
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+func getLocalIP() string {
+	// Dial an external address (doesn&#39;t actually send packets) to find
+	// which local interface the OS would use — most reliable method.
+	conn, err := net.Dial(&#34;udp&#34;, &#34;8.8.8.8:80&#34;)
+	if err != nil {
+		// fallback: walk interfaces
+		addrs, _ := net.InterfaceAddrs()
+		for _, addr := range addrs {
+			if ipnet, ok := addr.(*net.IPNet); ok &amp;&amp; !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					return ipnet.IP.String()
+				}
+			}
+		}
+		return &#34;127.0.0.1&#34;
+	}
+	defer conn.Close()
+	return conn.LocalAddr().(*net.UDPAddr).IP.String()
+}
+
+// ── main ──────────────────────────────────────────────────────────────────────
+
+func main() {
+	localIP := getLocalIP()
+	port := 8080
+	url := fmt.Sprintf(&#34;http://%s:%d&#34;, localIP, port)
+	CheckLANAccess()
+	// Generate QR code bytes ONCE at startup — fail loudly if it errors
+	qrBytes, err := qrcode.Encode(url, qrcode.Medium, 256)
+	if err != nil {
+		log.Fatalf(&#34;QR encode failed: %v&#34;, err)
+	}
+
+	// ── HTTP handlers ─────────────────────────────────────────────────────────
+
+	http.HandleFunc(&#34;/&#34;, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			if content := r.FormValue(&#34;content&#34;); content != &#34;&#34; {
+				mu.Lock()
+				posts = append(posts, content)
+				mu.Unlock()
+				// PRG pattern: redirect after POST so refresh doesn&#39;t re-submit
+				http.Redirect(w, r, &#34;/&#34;, http.StatusSeeOther)
+				return
+			}
+		}
+		mu.RLock()
+		snapshot := make([]string, len(posts))
+		copy(snapshot, posts)
+		mu.RUnlock()
+
+		// reverse so newest first
+		for i, j := 0, len(snapshot)-1; i &lt; j; i, j = i+1, j-1 {
+			snapshot[i], snapshot[j] = snapshot[j], snapshot[i]
+		}
+
+		w.Header().Set(&#34;Content-Type&#34;, &#34;text/html; charset=utf-8&#34;)
+		tmpl.Execute(w, struct {
+			URL   string
+			Posts []string
+		}{url, snapshot})
+	})
+
+	http.HandleFunc(&#34;/qr&#34;, func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set(&#34;Content-Type&#34;, &#34;image/png&#34;)
+		w.Write(qrBytes)
+	})
+
+	// ── mDNS registration — keep alive until shutdown ─────────────────────────
+	// FIX: store the server reference outside the goroutine so we can shut it
+	//      down explicitly, and block inside the goroutine so it stays alive.
+	mdnsServer, err := zeroconf.Register(
+		&#34;LocalBlog&#34;,  // service instance name  → shows as &#34;LocalBlog&#34; in Bonjour/Avahi
+		&#34;_http._tcp&#34;, // service type
+		&#34;local.&#34;,     // domain
+		port,
+		[]string{&#34;path=/&#34;}, // TXT record (optional metadata)
+		nil,                // use all network interfaces
+	)
+	if err != nil {
+		log.Printf(&#34;mDNS registration failed (not fatal): %v&#34;, err)
+		// not fatal — IP-based access still works
+	} else {
+		log.Println(&#34;mDNS registered: LocalBlog._http._tcp.local.&#34;)
+	}
+
+	// ── Start HTTP server in background ──────────────────────────────────────
+	go func() {
+		log.Printf(&#34;Listening on :%d&#34;, port)
+		if err := http.ListenAndServe(fmt.Sprintf(&#34;:%d&#34;, port), nil); err != nil {
+			log.Fatalf(&#34;HTTP server error: %v&#34;, err)
+		}
+	}()
+	// go func() {
+	// 	log.Printf(&#34;HTTPS listening on :8080&#34;)
+	// 	err := http.ListenAndServeTLS(
+	// 		&#34;:8080&#34;,
+	// 		// &#34;cert.pem&#34;,
+	// 		// &#34;key.pem&#34;,
+	// 		&#34;LocalBlog.local+1.pem&#34;,
+	// 		&#34;LocalBlog.local+1-key.pem&#34;,
+	// 		nil,
+	// 	)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }()
+
+	log.Printf(&#34;\n\n  📡  Local Blog is live!\n&#34;)
+	log.Printf(&#34;  %-18s %s\n&#34;, &#34;Open on this PC:&#34;, url)
+	log.Printf(&#34;  %-18s %s/qr\n&#34;, &#34;QR image:&#34;, url)
+	log.Printf(&#34;  %-18s LocalBlog.local:%d  (Apple/Linux only)\n\n&#34;, &#34;mDNS:&#34;, port)
+
+	// ── Block until Ctrl-C / SIGTERM ──────────────────────────────────────────
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	&lt;-sig
+
+	log.Println(&#34;Shutting down…&#34;)
+	if mdnsServer != nil {
+		mdnsServer.Shutdown() // clean mDNS goodbye packet
+	}
+}
+</code></pre><h3 id="file-maingo-1">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;crypto/rand&#34;
+	&#34;crypto/rsa&#34;
+	&#34;crypto/x509&#34;
+	&#34;crypto/x509/pkix&#34;
+	&#34;encoding/pem&#34;
+	&#34;math/big&#34;
+	&#34;os&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	// Generate private key
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	// Certificate template
+	serialNumber, err := rand.Int(rand.Reader, big.NewInt(1&lt;&lt;62))
+	if err != nil {
+		panic(err)
+	}
+
+	certTemplate := x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization: []string{&#34;Example Org&#34;},
+			CommonName:   &#34;localhost&#34;,
+		},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(365 * 24 * time.Hour),
+
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+
+		DNSNames: []string{&#34;localhost&#34;},
+	}
+
+	// Create certificate
+	certDER, err := x509.CreateCertificate(
+		rand.Reader,
+		&amp;certTemplate,
+		&amp;certTemplate,
+		&amp;privateKey.PublicKey,
+		privateKey,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	// Write certificate to file
+	certOut, err := os.Create(&#34;cert.pem&#34;)
+	if err != nil {
+		panic(err)
+	}
+	pem.Encode(certOut, &amp;pem.Block{Type: &#34;CERTIFICATE&#34;, Bytes: certDER})
+	certOut.Close()
+
+	// Write private key to file
+	keyOut, err := os.Create(&#34;key.pem&#34;)
+	if err != nil {
+		panic(err)
+	}
+	pem.Encode(keyOut, &amp;pem.Block{
+		Type:  &#34;RSA PRIVATE KEY&#34;,
+		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
+	})
+	keyOut.Close()
+}
+</code></pre>
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

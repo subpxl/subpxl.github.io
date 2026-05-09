@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Presentations on Shubham Panchal - Engineering Lead</title>
+    <link>https://subpxl.github.io/presentations/</link>
+    <description>Recent content in Presentations on Shubham Panchal - Engineering Lead</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://subpxl.github.io/presentations/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Clawdlike agent in go</title>
+      <link>https://subpxl.github.io/presentations/clawdlike-agent-in-go/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/clawdlike-agent-in-go/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>concurrency golang</title>
+      <link>https://subpxl.github.io/presentations/concurrency-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/concurrency-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>concurrencypattern in golang</title>
+      <link>https://subpxl.github.io/presentations/concurrencypattern-in-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/concurrencypattern-in-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>customer support agent with langchain</title>
+      <link>https://subpxl.github.io/presentations/customer-support-agent-with-langchain/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/customer-support-agent-with-langchain/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Data processing pipeline go</title>
+      <link>https://subpxl.github.io/presentations/data-processing-pipeline-go/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/data-processing-pipeline-go/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>datastructures in golang</title>
+      <link>https://subpxl.github.io/presentations/datastructures-in-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/datastructures-in-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>DDD Golang</title>
+      <link>https://subpxl.github.io/presentations/ddd-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/ddd-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>design patterns golang</title>
+      <link>https://subpxl.github.io/presentations/design-patterns-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/design-patterns-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ecommerce microservices</title>
+      <link>https://subpxl.github.io/presentations/ecommerce-microservices/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/ecommerce-microservices/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>floydds harre tortoise</title>
+      <link>https://subpxl.github.io/presentations/floydds-harre-tortoise/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/floydds-harre-tortoise/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>go api.jpg</title>
+      <link>https://subpxl.github.io/presentations/go-api.jpg/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/go-api.jpg/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>images</title>
+      <link>https://subpxl.github.io/presentations/images/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/images/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>microservice-ecom</title>
+      <link>https://subpxl.github.io/presentations/microservice-ecom/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/microservice-ecom/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/1.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/2.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/3.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/4.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/5.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/6.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/7.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/8.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/9.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/10.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/11.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/12.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/13.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/14.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/15.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/16.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/17.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/18.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/microservice-ecom/19.png&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>solid principles golang</title>
+      <link>https://subpxl.github.io/presentations/solid-principles-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/solid-principles-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>temporal with golang</title>
+      <link>https://subpxl.github.io/presentations/temporal-with-golang/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/temporal-with-golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Video</title>
+      <link>https://subpxl.github.io/presentations/video/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/video/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/Video/1.jpg&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/Video/2.jpg&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/Video/3.jpg&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;https://subpxl.github.io/images/presentations/Video/4.jpg&#34; alt=&#34;Slide&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Video Engineering Live sport event</title>
+      <link>https://subpxl.github.io/presentations/video-engineering-live-sport-event/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/presentations/video-engineering-live-sport-event/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

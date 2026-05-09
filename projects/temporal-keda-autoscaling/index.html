@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="View GitHub Repository
+keda pod autoscaling for a worker pod written in golang pod can be any application
+keda takes a trigger and scales the pod
+the triggers are …"><meta property="og:title" content="temporal-keda-autoscaling"><meta property="og:description" content="View GitHub Repository
+keda pod autoscaling for a worker pod written in golang pod can be any application
+keda takes a trigger and scales the pod
+the triggers are …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/projects/temporal-keda-autoscaling/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    <span class="badge bg-primary mb-3">Go Cloud</span>
+    
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">temporal-keda-autoscaling</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <p><a href="https://github.com/subpxl/temporal-keda-autoscaling">View GitHub Repository</a></p>
+<p>keda pod autoscaling for a worker pod written in golang
+pod can be any application</p>
+<p>keda takes a trigger and scales the pod</p>
+<p>the triggers are
+temporal task queue lenght
+rabbitmq message queue length</p>
+<p>to start with rabbitmq trigger run hit_rabbitmq/main.go to send messages to rabbitmq</p>
+<p>for temporal queue length , it requires a lot of tasks in queue  with big timeouts at same time</p>
+<p><img src="flow.png" alt="flow"></p>
+<h1 id="start-here">Start Here</h1>
+<p>this can be achieved witrh task file
+or
+for individual steps</p>
+<h2 id="prefer-wsl-for-windows">Prefer WSL for windows</h2>
+<p>read steps below</p>
+<h3 id="install-kind">Install kind</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>go install sigs.k8s.io/kind@v0.30.0
+</span></span></code></pre></div><h2 id="initial-setup">initial setup</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kind delete cluster --name keda-demo-cluster
+</span></span><span style="display:flex;"><span>kind create cluster --name keda-demo-cluster
+</span></span><span style="display:flex;"><span>kubectl create namespace keda-temporal
+</span></span></code></pre></div><h3 id="install-keda">install keda</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>helm repo add kedacore https://kedacore.github.io/charts
+</span></span><span style="display:flex;"><span>helm repo update
+</span></span><span style="display:flex;"><span>helm install keda kedacore/keda --namespace keda-temporal
+</span></span></code></pre></div><h3 id="install-rabbitmq">install rabbitmq</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get pods -n keda-temporal
+</span></span><span style="display:flex;"><span>kubectl apply -f keda/rabbitmq.yaml
+</span></span><span style="display:flex;"><span>kubectl get pods -n keda-temporal
+</span></span></code></pre></div><h3 id="install-temporal">install temporal</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -t temporal-dev:latest ./temporal
+</span></span><span style="display:flex;"><span>kind load docker-image temporal-dev:latest --name keda-demo-cluster
+</span></span><span style="display:flex;"><span>kubectl apply -f temporal/temporal-deployment.yaml
+</span></span></code></pre></div><h3 id="install-go-api">install go api</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -t temporal-go-api:latest ./go-api
+</span></span><span style="display:flex;"><span>kind load docker-image temporal-go-api:latest --name keda-demo-cluster 
+</span></span><span style="display:flex;"><span>kubectl apply -f go-api/go-api-deployment.yaml
+</span></span></code></pre></div><h3 id="install-worker">install worker</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -t temporal-worker:latest ./worker 
+</span></span><span style="display:flex;"><span>kind load docker-image temporal-worker:latest --name keda-demo-cluster 
+</span></span><span style="display:flex;"><span>kubectl rollout restart deployment temporal-worker -n keda-temporal
+</span></span><span style="display:flex;"><span>kubectl apply -f worker/worker-deployment.yaml
+</span></span></code></pre></div><h3 id="check-go-api">check go api</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get pods -n keda-temporal
+</span></span><span style="display:flex;"><span>kubectl port-forward -n keda-temporal svc/temporal-go-api 8080:8080
+</span></span></code></pre></div><h3 id="apply-autoscaling">apply autoscaling</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl apply -f keda/temporal-worker-scaledobject.yaml
+</span></span></code></pre></div><h3 id="check-autoscaling">check autoscaling</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl port-forward -n keda-temporal svc/temporal-go-api 8080:8080
+</span></span></code></pre></div><h1 id="visit">visit</h1>
+<p>http://localhost:8080/workers</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl port-forward -n keda-temporal svc/temporal-ui 30000:8233
+</span></span></code></pre></div><h3 id="temporal-ui">temporal ui</h3>
+<p>visit http://localhost:30000</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span> kubectl apply -f keda/temporal-worker-scaledobject.yaml
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl port-forward svc/temporal-go-api 8080:8080 -n keda-temporal
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl port-forward -n keda-temporal svc/my-rabbitmq 15672:15672
+</span></span></code></pre></div><h3 id="to-monitor-temporal-hpa-when-rabbitmq-sends-message">To monitor temporal hpa when rabbitmq sends message</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl get hpa -n keda-temporal -w  
+</span></span></code></pre></div><h3 id="to-trigger-rabbitmq">To trigger rabbitmq</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>go run hit_rabbitmq/main.go
+</span></span></code></pre></div><h3 id="to-trigger-temporal">to trigger temporal</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#66d9ef">for</span>     i in <span style="color:#f92672">{</span>1..1000<span style="color:#f92672">}</span>; <span style="color:#66d9ef">do</span> curl -X POST http://localhost:18080/tasks <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>	  -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>	  -d <span style="color:#e6db74">&#39;{&#34;name&#34;:&#34;alice&#34;}&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span></code></pre></div><hr>
+<h1 id="to-debug">To Debug</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl run debug-pod --rm -i --tty --image<span style="color:#f92672">=</span>alpine -- sh
+</span></span></code></pre></div><p>visit http://localhost:30000</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl port-forward -n keda-temporal svc/temporal-metrics 30001:9100
+</span></span></code></pre></div><p>visit http://localhost:30001/metrics</p>
+
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

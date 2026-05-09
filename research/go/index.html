@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Go.
+File: api.go package mainimport (&#34;database/sql&#34; …"><meta property="og:title" content="Go"><meta property="og:description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Go.
+File: api.go package mainimport (&#34;database/sql&#34; …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/research/go/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    
+    <span class="badge bg-secondary mb-3">Deep Dive</span>
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">Go</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <h2 id="research--code-notes">Research &amp; Code Notes</h2>
+<p>This document contains text-heavy extracts and code snippets from my research on Go.</p>
+<h3 id="file-apigo">File: api.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;database/sql&#34;
+	&#34;encoding/json&#34;
+	&#34;log&#34;
+	&#34;net/http&#34;
+)
+
+type API struct {
+	DB *sql.DB
+}
+
+type User struct {
+	ID       uint   `json:&#34;id&#34;`
+	Username string `json:&#34;username&#34;`
+	Email    string `json:&#34;email&#34;`
+	Password string `json:&#34;password&#34;`
+}
+
+// const (
+// 	RoleName = iota
+
+// )
+
+type Role struct {
+}
+
+func Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(&#34; entering middleware&#34;)
+		next.ServeHTTP(w, r)
+		log.Println(&#34; exitign middleware&#34;)
+	})
+}
+
+func CheckRole(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get(&#34;role&#34;) == &#34;admin&#34; {
+
+			next.ServeHTTP(w, r)
+			log.Println(&#34; exitign middleware&#34;)
+		} else {
+			http.Error(w, &#34;unauthorized&#34;, http.StatusUnauthorized)
+		}
+	})
+}
+
+func (a *API) Index(w http.ResponseWriter, r *http.Request) {
+	rows, err := a.DB.Query(&#34;select * from users;&#34;)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// defer a.DB.Close()
+	var users []User
+	for rows.Next() {
+		var user User
+		err := rows.Scan(&amp;user.ID, &amp;user.Username)
+		if err != nil {
+			log.Fatal(err)
+		}
+		users = append(users, user)
+	}
+	json.NewEncoder(w).Encode(users)
+
+}
+</code></pre><h3 id="file-daatabasego">File: daatabase.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;database/sql&#34;
+	&#34;log&#34;
+	&#34;log/slog&#34;
+
+	_ &#34;modernc.org/sqlite&#34;
+)
+
+var DB *sql.DB
+var err error
+
+func InitDB(dbname string) (*sql.DB, error) {
+	DB, err = sql.Open(&#34;sqlite&#34;, dbname)
+	if err != nil {
+		log.Fatal(&#34;error &#34;, err)
+		return nil, err
+	}
+
+	return DB, nil
+}
+
+func Migrate(db *sql.DB) error {
+	query := `
+	CREATE TABLE IF NOT EXISTS users(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		username TEXT UNIQUE NOT NULL,
+		email TEXT UNIQUE NOT NULL,
+		password TEXT NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);`
+
+	_, err := db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	slog.Info(&#34;table created successfully&#34;)
+
+	if err := FakeUsers(db); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func FakeUsers(db *sql.DB) error {
+	query := `
+	INSERT OR IGNORE INTO users(username,email,password)
+	VALUES(?,?,?)`
+
+	result, err := db.Exec(query, &#34;apple&#34;, &#34;aW@c.com&#34;, &#34;rrg&#34;)
+	if err != nil {
+		return err
+	}
+
+	id, _ := result.LastInsertId()
+	log.Println(&#34;inserted successfully&#34;, id)
+
+	return nil
+}
+</code></pre><h3 id="file-maingo">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;bytes&#34;
+	&#34;database/sql&#34;
+	&#34;encoding/json&#34;
+	&#34;fmt&#34;
+	&#34;log&#34;
+	&#34;net/http&#34;
+	&#34;time&#34;
+)
+
+const defaultOllamaUrl = &#34;http://localhost:11434/api/chat&#34;
+const ModelName = &#34;qwen2.5:1.5b&#34;
+
+func setupAPI(db *sql.DB) {
+	app := API{DB: db}
+	http.Handle(&#34;/&#34;, Middleware(http.HandlerFunc(app.Index)))
+	// http.Handle(&#34;/&#34;, CheckRole(http.HandlerFunc(app.Index)))
+}
+
+func main() {
+
+	db, err := InitDB(&#34;my.db&#34;)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = Migrate(db); err != nil {
+		log.Fatal(err)
+
+	}
+	// myConfig := Config{VectorStorePath: &#34;qdrant_store&#34;, LLM: &#34;qwen2.5&#34;}
+	// shortTermMemory := ShortTermMemory{}
+	// myagent := Agent{ShortTermMemory: shortTermMemory}
+	// start := time.Now()
+
+	// ollamaLLM := OLLAMALLM{Url: defaultOllamaUrl}
+
+	// agent := Agent{LLM: &amp;ollamaLLM}
+
+	// reader := bufio.NewReader(os.Stdin)
+	// for {
+	// 	fmt.Println(&#34;enter text &#34;)
+	// 	input, _ := reader.ReadString(&#39;\n&#39;)
+	// 	input = strings.TrimSpace(input)
+	// 	if input == &#34;exit&#34; {
+	// 		break
+	// 	}
+
+	// 	fmt.Println(&#34;you typed&#34;, input)
+	// 	msg := Message{
+	// 		Role:    &#34;user&#34;,
+	// 		Content: input,
+	// 	}
+
+	// 	request := Request{Messages: []Message{msg}, Model: ModelName, Stream: false}
+	// 	// agent.LLM.generate(request)
+	// 	resp, err := agent.LLM.generate(request)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		os.Exit(1)
+	// 	}
+	// 	fmt.Println(&#34;agent response:&#34;, resp.Message.Content)
+	// 	fmt.Println(&#34;completed in &#34;, time.Since(start))
+	// }
+
+	setupAPI(db)
+	port := &#34;:8000&#34;
+	fmt.Println(&#34;running on  &#34;, port)
+	err = http.ListenAndServe(port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+type Config struct {
+	VectorStorePath string
+	LLM             LLM
+}
+
+type App struct {
+}
+
+type Request struct {
+	Model    string    `json:&#34;model&#34;`
+	Messages []Message `json:&#34;messages&#34;`
+	Stream   bool      `json:&#34;stream&#34;`
+}
+
+type Response struct {
+	Model            string    `json:&#34;model&#34;`
+	CreatedAt        time.Time `json:&#34;created_at&#34;`
+	Message          Message   `json:&#34;message&#34;`
+	Done             bool      `json:&#34;done&#34;`
+	TotalDuration    int64     `json:&#34;total_duration&#34;`
+	LoadDuration     int       `json:&#34;load_duration&#34;`
+	PromptEvaluation int       `json:&#34;prompt_evaluation&#34;`
+	EvalCount        int       `json:&#34;eval_count&#34;`
+	EvalDuration     int64     `json:&#34;eval_duration&#34;`
+}
+
+func (llm *OLLAMALLM) generate(ollamaReq Request) (*Response, error) {
+	js, err := json.Marshal(&amp;ollamaReq)
+	if err != nil {
+		return nil, err
+	}
+	client := http.Client{}
+	httpReq, err := http.NewRequest(http.MethodPost, llm.Url, bytes.NewReader(js))
+	if err != nil {
+		return nil, err
+	}
+	httpResp, err := client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+	ollamaResp := Response{}
+	err = json.NewDecoder(httpResp.Body).Decode(&amp;ollamaResp)
+	return &amp;ollamaResp, err
+}
+
+type Message struct {
+	Role    string `json:&#34;role&#34;`
+	Content string `json:&#34;content&#34;`
+}
+
+type LLM interface {
+	generate(ollamaReq Request) (*Response, error)
+}
+
+type OLLAMALLM struct {
+	Url   string
+	Model string
+}
+
+type Agent struct {
+	ShortTermMemory ShortTermMemory
+	LongTermMemory  LongTermMemory
+	Skills          []Skill
+	Tools           []Tool
+	VectorStore     VectorStore
+	LLM             LLM
+}
+
+type VectorStore struct {
+}
+
+type ShortTermMemory struct {
+	Messages []Message
+}
+
+type LongTermMemory struct {
+}
+
+type Skill struct {
+}
+
+type Tool struct {
+}
+</code></pre><h3 id="file-data-stream-processorgo">File: data-stream-processor.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;net/http&#34;
+
+	&#34;github.com/gorilla/websocket&#34;
+	ext &#34;github.com/reugn/go-streams/extension&#34;
+	&#34;github.com/reugn/go-streams/flow&#34;
+)
+
+var upgrader = websocket.Upgrader{}
+
+type Job struct {
+	Data string
+	Resp chan string
+}
+
+var jobs = make(chan Job, 100)
+
+func main() {
+
+	fmt.Println(&#34;hre&#34;)
+
+	for i := 0; i &lt; 5; i++ {
+		go worker(i)
+	}
+	http.HandleFunc(&#34;/ws&#34;, wsHandler)
+
+	http.HandleFunc(&#34;/&#34;, reverserHandler)
+
+	fmt.Println(&#34;rinnung on 8000&#34;)
+	http.ListenAndServe(&#34;:8000&#34;, nil)
+}
+
+func wsHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	for {
+		_, msg, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+
+		resp := make(chan string, 20)
+
+		jobs &lt;- Job{
+			Data: string(msg),
+			Resp: resp,
+		}
+
+		result := &lt;-resp
+		fmt.Println(&#34;received:&#34;, string(msg))
+		conn.WriteMessage(websocket.TextMessage, []byte(result))
+	}
+}
+
+func reverserHandler(w http.ResponseWriter, r *http.Request) {
+	file := r.FormValue(&#34;file&#34;)
+
+	job := Job{
+		Data: file,
+		Resp: nil,
+	}
+	select {
+	case jobs &lt;- job:
+		fmt.Fprintln(w, &#34;job queued&#34;)
+	default:
+		http.Error(w, &#34;queue full&#34;, http.StatusTooManyRequests)
+	}
+}
+
+func worker(id int) {
+	for job := range jobs {
+		fmt.Println(&#34;worker&#34;, id, &#34;processing&#34;, job.Data)
+
+		result := processFile(job.Data, id)
+
+		if job.Resp != nil {
+			job.Resp &lt;- result
+		}
+	}
+}
+
+func processFile(file string, id int) string {
+	source := ext.NewFileSource(file)
+	reverseMapFlow := flow.NewMap(reverseString, 1)
+	newLineMapFlow := flow.NewMap(addNewLine, 1)
+
+	out := fmt.Sprintf(&#34;out%d.txt&#34;, id)
+	sink := ext.NewFileSink(out)
+
+	source.Via(reverseMapFlow).Via(newLineMapFlow).To(sink)
+
+	return out
+}
+
+func reverseString(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i &lt; j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+
+}
+func addNewLine(s string) string {
+	return s + &#34;\n&#34;
+}
+
+// it runs continiously
+// it gets incomig data from a queue as payload
+// it starts a bg worker pool concurrent to process csv
+// it updates data
+</code></pre><h3 id="file-intxt">File: in.txt</h3>
+<pre tabindex="0"><code>January
+February
+March
+April
+May
+June
+July
+August
+September
+October
+November
+December
+</code></pre><h3 id="file-out0txt">File: out0.txt</h3>
+<pre tabindex="0"><code>yraunaJ
+yraurbeF
+hcraM
+lirpA
+yaM
+enuJ
+yluJ
+tsuguA
+rebmetpeS
+rebotcO
+rebmevoN
+rebmeceD
+</code></pre><h3 id="file-out1txt">File: out1.txt</h3>
+<pre tabindex="0"><code>yraunaJ
+yraurbeF
+hcraM
+lirpA
+yaM
+enuJ
+yluJ
+tsuguA
+rebmetpeS
+rebotcO
+rebmevoN
+rebmeceD
+</code></pre><h3 id="file-out2txt">File: out2.txt</h3>
+<pre tabindex="0"><code>yraunaJ
+yraurbeF
+hcraM
+lirpA
+yaM
+enuJ
+yluJ
+tsuguA
+rebmetpeS
+rebotcO
+rebmevoN
+rebmeceD
+</code></pre><h3 id="file-out3txt">File: out3.txt</h3>
+<pre tabindex="0"><code>yraunaJ
+yraurbeF
+hcraM
+lirpA
+yaM
+enuJ
+yluJ
+tsuguA
+rebmetpeS
+rebotcO
+rebmevoN
+rebmeceD
+</code></pre><h3 id="file-out4txt">File: out4.txt</h3>
+<pre tabindex="0"><code>yraunaJ
+yraurbeF
+hcraM
+lirpA
+yaM
+enuJ
+yluJ
+tsuguA
+rebmetpeS
+rebotcO
+rebmevoN
+rebmeceD
+</code></pre><h3 id="file-maingo-1">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+
+	fmt.Println(twosum([]int{2, 11, 7, 15}, 9))
+}
+
+func twosum(nums []int, target int) []int {
+	m := make(map[int]int)
+
+	for i, v := range nums {
+		if idx, ok := m[target-v]; ok {
+			return []int{idx, i}
+		}
+		m[v] = i
+	}
+	return nil
+}
+</code></pre><h3 id="file-maingo-2">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	c1 := make(chan struct{})
+	c2 := make(chan struct{})
+	c3 := make(chan struct{})
+	done := make(chan struct{})
+
+	n := 10
+
+	go func() {
+		for i := 0; i &lt; n; i++ {
+			&lt;-c1
+			fmt.Print(&#34;1 &#34;)
+			c2 &lt;- struct{}{}
+		}
+	}()
+
+	go func() {
+		for i := 0; i &lt; n; i++ {
+			&lt;-c2
+			fmt.Print(&#34;2 &#34;)
+			c3 &lt;- struct{}{}
+		}
+	}()
+
+	go func() {
+		for i := 0; i &lt; n; i++ {
+			&lt;-c3
+			fmt.Print(&#34;3 &#34;)
+			if i != n-1 {
+				c1 &lt;- struct{}{}
+			} else {
+				done &lt;- struct{}{}
+			}
+
+		}
+
+	}()
+
+	c1 &lt;- struct{}{}
+	&lt;-done
+}
+</code></pre><h3 id="file-maingo-3">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	// 	mychan := make(chan string, 10)
+
+	// 	mychan &lt;- &#34;hello&#34;
+	// 	done := make(chan struct{})
+	// 	// close(mychan)
+
+	// 	go printer(mychan, done)
+	// 	&lt;-done
+
+	nujobs := 5
+	jobs := make(chan int, nujobs)
+	result := make(chan int, nujobs)
+	for w := 1; w &lt;= 3; w++ {
+		go worker(w, jobs, result)
+	}
+
+	for j := 1; j &lt;= nujobs; j++ {
+		jobs &lt;- j
+	}
+
+	close(jobs)
+
+	for a := 1; a &lt;= nujobs; a++ {
+		fmt.Println(&#34;res&#34;, &lt;-result)
+	}
+
+}
+
+func printer(mychan chan string, done chan struct{}) {
+
+	val := &lt;-mychan
+	fmt.Println(val)
+	done &lt;- struct{}{}
+
+}
+
+func worker(id int, jobs &lt;-chan int, result chan int) {
+	for j := range jobs {
+		fmt.Println(&#34;worker &#34;, id, &#34;staretd &#34;, j)
+		time.Sleep(1 * time.Second)
+		result &lt;- j * 2
+	}
+}
+</code></pre><h3 id="file-maingo-4">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;bufio&#34;
+	&#34;database/sql&#34;
+	&#34;fmt&#34;
+	&#34;io&#34;
+	&#34;log&#34;
+	&#34;os&#34;
+	&#34;strings&#34;
+
+	_ &#34;github.com/jackc/pgx/v5/stdlib&#34;
+)
+
+func main() {
+
+	// searchinfiles(&#34;alice.logs&#34;,&#34;mouse&#34;)
+
+	connStr := &#34;postgres://mydb:mydb@localhost:5432/mydb?sslmode=disable&#34;
+
+	db, err := sql.Open(&#34;pgx&#34;, connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(&#34;connected&#34;)
+	createtable(db)
+	insertdata(db)
+	querydata(db)
+	querysinglerow(db)
+	updatedb(db)
+	deleterecord(db)
+}
+
+func createtable(db *sql.DB) {
+	_, err := db.Exec(
+		`create table if not exists logs(
+		id serial primary key,
+		message text
+		)`)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func insertdata(db *sql.DB) {
+	_, err := db.Exec(
+		`insert into logs (message) values ($1)`, &#34;helloformogo&#34;)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func querydata(db *sql.DB) {
+	rows, err := db.Query(&#34;select id , message from logs&#34;)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		var msg string
+		err := rows.Scan(&amp;id, &amp;msg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(id, msg)
+	}
+}
+
+func querysinglerow(db *sql.DB) {
+	var msg string
+	err := db.QueryRow(&#34;select message from logs where id=$1&#34;, 1).Scan(&amp;msg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(msg)
+}
+
+func updatedb(db *sql.DB) {
+	_, err := db.Exec(&#34;update logs SET message=$1 where id=$2&#34;, &#34;updated messaeg&#34;, 2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func deleterecord(db *sql.DB) {
+	_, err := db.Exec(&#34;delete from logs where id =$1&#34;, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func searchinfiles(filepath, searchword string) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+	// fmt.Println(string( file))
+
+	reader := bufio.NewReader(file)
+
+	for {
+		line, err := reader.ReadString(&#39;\n&#39;)
+
+		if err != nil {
+			if err == io.EOF {
+
+				if len(line) &gt; 0 &amp;&amp; strings.Contains(strings.ToLower(line), searchword) {
+					fmt.Print(line)
+				}
+				break
+			}
+			fmt.Println(&#34;Read error:&#34;, err)
+			return
+		}
+		if strings.Contains(strings.ToLower(line), searchword) {
+			fmt.Print(line) // last line (no newline)
+		}
+	}
+
+}
+</code></pre><h3 id="file-maingo-5">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;sync&#34;
+)
+
+func main() {
+	nums := []int{1, 2, 3, 4, 5}
+	out := make(chan int)
+
+	var wg sync.WaitGroup
+
+	for _, n := range nums {
+		wg.Add(1)
+		go func(x int) {
+			defer wg.Done()
+			out &lt;- x * x
+		}(n)
+	}
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	for v := range out {
+		fmt.Println(v)
+	}
+}
+</code></pre><h3 id="file-maingo-6">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+
+	somech := ch(&#34;hello&#34;)
+	close(somech)
+
+	for r := range somech {
+		fmt.Println(r)
+	}
+
+	reverseint(1345)
+	fmt.Println(&#34;calpar&#34;, valpar(&#34;()}&#34;))
+
+}
+
+func ch(r string) chan string {
+	mch := make(chan string, len(r))
+
+	for _, s := range r {
+		mch &lt;- string(s)
+	}
+	return mch
+}
+
+func reverseint(a int) int {
+	reversed := 0
+	for a != 0 {
+		r := a % 10
+		reversed = reversed*10 + r
+		a = a / 10
+	}
+	fmt.Println(reversed)
+	return reversed
+}
+
+func valpar(inp string) bool {
+	stack := []rune{}
+
+	for _, c := range inp {
+
+		switch c {
+		case &#39;[&#39;, &#39;(&#39;, &#39;{&#39;:
+			stack = append(stack, c)
+
+		case &#39;]&#39;, &#39;)&#39;, &#39;}&#39;:
+			if len(stack) == 0 {
+				return false
+			}
+
+			top := stack[len(stack)-1]
+			if (c == &#39;)&#39; &amp;&amp; top != &#39;(&#39;) ||
+				(c == &#39;]&#39; &amp;&amp; top != &#39;[&#39;) ||
+				(c == &#39;}&#39; &amp;&amp; top != &#39;{&#39;) {
+				return false
+			}
+		}
+
+	}
+	return len(stack) == 0
+
+}
+</code></pre><h3 id="file-maingo-7">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;context&#34;
+	&#34;fmt&#34;
+	&#34;time&#34;
+)
+
+func main() {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	ch1 := make(chan int)
+	ch2 := make(chan int)
+
+	go func() {
+		ch1 &lt;- 33
+	}()
+
+	go func() {
+		ch2 &lt;- 232323
+	}()
+
+	// timeout := time.After(2 * time.Second)
+Loop:
+	for {
+		select {
+		case v1 := &lt;-ch1:
+			fmt.Println(&#34;fron ch1 &#34;, v1)
+		case v2 := &lt;-ch2:
+			fmt.Println(&#34;fron ch2 &#34;, v2)
+		// case &lt;-timeout:
+		// 	break Loop
+		case &lt;-ctx.Done():
+			break Loop
+		default:
+			fmt.Println(&#34;wainting&#34;)
+			time.Sleep(1 * time.Second)
+		}
+	}
+	fmt.Println(&#34;end&#34;)
+}
+</code></pre><h3 id="file-maingo-8">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	ch := make(chan int, 4)
+
+	go func() {
+		ch &lt;- 1
+		ch &lt;- 2
+		ch &lt;- 3
+		ch &lt;- 4
+		ch &lt;- 5
+		close(ch)
+	}()
+
+	for num := range ch {
+		fmt.Println(num)
+	}
+}
+</code></pre><h3 id="file-maingo-9">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func merge(a, b &lt;-chan int) &lt;-chan int {
+	out := make(chan int)
+	go func() {
+		defer close(out)
+		for a != nil || b != nil {
+			select {
+			case v, ok := &lt;-a:
+				if !ok {
+					a = nil
+					continue
+				}
+				out &lt;- v
+			case v, ok := &lt;-b:
+				if !ok {
+					b = nil
+					continue
+				}
+				out &lt;- v
+			}
+
+		}
+	}()
+	return out
+}
+
+func main() {
+	a := make(chan int, 2)
+	b := make(chan int, 2)
+
+	a &lt;- 1
+	a &lt;- 2
+	close(a)
+	b &lt;- 3
+	b &lt;- 4
+	close(b)
+
+	for v := range merge(a, b) {
+		fmt.Println(v)
+	}
+}
+</code></pre><h3 id="file-maingo-10">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+
+	for v := range square(gen(1, 2, 3, 4, 5)) {
+		fmt.Println(v)
+	}
+}
+
+func gen(nums ...int) &lt;-chan int {
+	out := make(chan int)
+	go func() {
+		for _, n := range nums {
+			out &lt;- n
+		}
+		close(out)
+	}()
+	return out
+}
+
+func square(in &lt;-chan int) &lt;-chan int {
+	out := make(chan int)
+	go func() {
+		for n := range in {
+			out &lt;- n * n
+		}
+		close(out)
+	}()
+	return out
+}
+</code></pre><h3 id="file-maingo-11">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+
+	n := 5
+
+	num := make(chan struct{})
+	zero := make(chan struct{})
+	donechan := make(chan struct{})
+
+	go func() {
+		for i := 1; i &lt;= n; i++ {
+			&lt;-zero
+			fmt.Print(i, &#34; &#34;)
+			num &lt;- struct{}{}
+		}
+		}()
+		
+		go func() {
+			for i := 1; i &lt;= n; i++ {
+				fmt.Print(0, &#34; &#34;)
+				zero &lt;- struct{}{}
+				&lt;-num
+			}
+			close(donechan)
+	}()
+
+
+	&lt;-donechan
+}
+</code></pre><h3 id="file-maingo-12">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+
+	a := make(chan struct{})
+	b := make(chan struct{})
+	done := make(chan struct{})
+
+	n := 5
+
+	go func() {
+		for i := 1; i &lt;= n; i += 2 {
+			&lt;-a
+			fmt.Println(&#34;hi&#34;, i)
+
+			if i+1 &lt;=n{
+
+				b &lt;- struct{}{}
+			}
+		}
+		done &lt;- struct{}{}
+	}()
+
+	go func() {
+		for i := 2; i &lt;= n; i += 2 {
+			&lt;-b
+			fmt.Println(&#34;yo&#34;, i)
+			a &lt;- struct{}{}
+		}
+
+	}()
+
+	a &lt;- struct{}{}
+
+	&lt;-done
+}
+</code></pre><h3 id="file-maingo-13">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;sync&#34;
+)
+
+func main() {
+	var wg sync.WaitGroup
+	barrier := make(chan struct{})
+
+	for i := 0; i &lt; 3; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			fmt.Println(&#34;before&#34;, id)
+			barrier &lt;- struct{}{}
+			&lt;-barrier
+			fmt.Println(&#34;after&#34;, id)
+		}(i)
+	}
+
+	// release all
+	for i := 0; i &lt; 3; i++ {
+		&lt;-barrier
+	}
+	close(barrier)
+
+	wg.Wait()
+}
+</code></pre><h3 id="file-maingo-14">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;sync&#34;
+)
+
+func worker(id int, jobs &lt;-chan int, results chan int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for j := range jobs {
+		results &lt;- j * 2
+	}
+}
+
+func main() {
+	jobs := make(chan int, 5)
+	results := make(chan int, 5)
+
+	var wg sync.WaitGroup
+	for i := 0; i &lt; 3; i++ {
+		wg.Add(1)
+		go worker(i, jobs, results, &amp;wg)
+	}
+
+	for i := 1; i &lt;= 5; i++ {
+		jobs &lt;- i
+	}
+
+	close(jobs)
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	for r := range results {
+		fmt.Println(r)
+	}
+}
+</code></pre><h3 id="file-readmemd">File: readme.md</h3>
+<pre tabindex="0"><code>docker exec -it postgres_db psql -U user -d db
+
+
+
+make a microservicce with go 
+    ddd
+psql 
+rabbitmq 
+docker compose 
+
+
+
+
+1 create docker compose for postgresql , rabbitmq
+create go app with chi router and ddd pattern 
+make crud 
+crerate user / auth 
+test rest 
+
+
+
+api gateway 
+product service
+order service
+</code></pre><h3 id="file-maingo-15">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;log/slog&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+	&#34;service1/internal/config&#34;
+	&#34;service1/internal/db&#34;
+	&#34;service1/internal/handler&#34;
+	&#34;service1/internal/kafka&#34;
+	&#34;service1/internal/logger&#34;
+	otelsetup &#34;service1/internal/otel&#34;
+	&#34;service1/internal/repository&#34;
+	&#34;service1/internal/service&#34;
+
+	&#34;github.com/go-chi/chi/v5&#34;
+	&#34;go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp&#34;
+	&#34;go.opentelemetry.io/otel&#34;
+)
+
+func main() {
+	logger.Init()
+
+	// conn := &#34;postgres://user:pass@localhost:5432/db&#34;
+	cfg, err := config.LoadFromVault()
+	if err != nil {
+		logger.Log.Error(&#34;vault load failed&#34;, slog.Any(&#34;error&#34;, err))
+		os.Exit(1)
+	}
+
+	conn := cfg.ConnString()
+
+	database, err := db.Init(conn)
+	if err != nil {
+		logger.Log.Error(&#34;db connection failed&#34;, slog.Any(&#34;error&#34;, err))
+		os.Exit(1)
+	}
+	if err := db.Migrate(database); err != nil {
+		logger.Log.Error(&#34;migration failed&#34;, slog.Any(&#34;error&#34;, err))
+
+		os.Exit(1)
+	}
+
+	repo := repository.NewUserRepo(database)
+	producer := kafka.NewProducer(&#34;localhost:9092&#34;, &#34;user-events&#34;)
+	svc := service.NewUserService(repo, producer)
+
+	var tr = otel.Tracer(&#34;user-service&#34;)
+
+	h := handler.NewUserHandler(svc, tr)
+
+	r := chi.NewRouter()
+	shutdown := otelsetup.InitTracer()
+	defer shutdown()
+	wrapped := otelhttp.NewHandler(r, &#34;http-server&#34;)
+
+	h.Routes(r)
+
+	logger.Log.Info(&#34;server starting&#34;, slog.String(&#34;port&#34;, &#34;8080&#34;))
+	if err := http.ListenAndServe(&#34;:8080&#34;, wrapped); err != nil {
+		logger.Log.Error(&#34;server failed&#34;, slog.Any(&#34;error&#34;, err))
+	}
+
+}
+</code></pre><h3 id="file-vaultgo">File: vault.go</h3>
+<pre tabindex="0"><code>package config
+
+import (
+	&#34;context&#34;
+	&#34;fmt&#34;
+
+	vault &#34;github.com/hashicorp/vault/api&#34;
+)
+
+type DBConfig struct {
+	User     string
+	Password string
+	Host     string
+	Port     string
+	Name     string
+}
+
+func LoadFromVault() (*DBConfig, error) {
+	cfg := vault.DefaultConfig()
+	cfg.Address = &#34;http://localhost:8200&#34;
+
+	client, err := vault.NewClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	client.SetToken(&#34;root&#34;)
+
+	secret, err := client.KVv2(&#34;secret&#34;).Get(context.Background(), &#34;db&#34;)
+	if err != nil {
+		return nil, err
+	}
+
+	data := secret.Data
+
+	return &amp;DBConfig{
+		User:     data[&#34;user&#34;].(string),
+		Password: data[&#34;password&#34;].(string),
+		Host:     data[&#34;host&#34;].(string),
+		Port:     data[&#34;port&#34;].(string),
+		Name:     data[&#34;name&#34;].(string),
+	}, nil
+}
+
+func (c *DBConfig) ConnString() string {
+	return fmt.Sprintf(
+		&#34;postgres://%s:%s@%s:%s/%s?sslmode=disable&#34;,
+		c.User, c.Password, c.Host, c.Port, c.Name,
+	)
+}
+</code></pre><h3 id="file-dbgo">File: db.go</h3>
+<pre tabindex="0"><code>package db
+
+import (
+	&#34;context&#34;
+	&#34;fmt&#34;
+
+	&#34;github.com/jackc/pgx/v5/pgxpool&#34;
+)
+
+func Init(url string) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(context.Background(), url)
+	if err != nil {
+		return nil, err
+	}
+	return pool, nil
+}
+
+func Migrate(db *pgxpool.Pool) error {
+	query := `
+	CREATE TABLE IF NOT EXISTS users (
+		id SERIAL PRIMARY KEY,
+		name TEXT NOT NULL,
+		email TEXT UNIQUE NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+
+	_, err := db.Exec(context.Background(), query)
+	if err != nil {
+		return fmt.Errorf(&#34;migration failed: %w&#34;, err)
+	}
+
+	return nil
+}
+</code></pre><h3 id="file-usergo">File: user.go</h3>
+<pre tabindex="0"><code>package events
+
+type UserCreatedEvent struct {
+	ID    int    `json:&#34;id&#34;`
+	Name  string `json:&#34;name&#34;`
+	Email string `json:&#34;email&#34;`
+}
+</code></pre><h3 id="file-handlergo">File: handler.go</h3>
+<pre tabindex="0"><code>package handler
+
+import (
+	&#34;encoding/json&#34;
+	&#34;net/http&#34;
+	&#34;service1/internal/metrics&#34;
+	&#34;service1/internal/middlewares&#34;
+	&#34;service1/internal/models&#34;
+	&#34;service1/internal/service&#34;
+	&#34;strconv&#34;
+
+	&#34;github.com/go-chi/chi/middleware&#34;
+	&#34;github.com/go-chi/chi/v5&#34;
+	&#34;github.com/prometheus/client_golang/prometheus/promhttp&#34;
+	&#34;go.opentelemetry.io/otel/trace&#34;
+)
+
+type UserHandler struct {
+	svc service.UserService
+	tr  trace.Tracer
+}
+
+func NewUserHandler(s service.UserService, tr trace.Tracer) *UserHandler {
+	return &amp;UserHandler{svc: s, tr: tr}
+}
+
+func (h *UserHandler) Routes(r chi.Router) {
+	metrics.Init()
+
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middlewares.PrometheusMiddleware)
+
+	r.Handle(&#34;/metrics&#34;, promhttp.Handler())
+	r.Route(&#34;/users&#34;, func(r chi.Router) {
+
+		r.Post(&#34;/&#34;, h.create)
+		r.Get(&#34;/&#34;, h.list)
+		r.Get(&#34;/{id}&#34;, h.get)
+		r.Put(&#34;/{id}&#34;, h.update)
+		r.Delete(&#34;/{id}&#34;, h.delete)
+	})
+}
+
+func (h *UserHandler) create(w http.ResponseWriter, r *http.Request) {
+	ctx, span := h.tr.Start(r.Context(), &#34;CreateUser&#34;)
+	defer span.End()
+
+	var u models.User
+
+	err := json.NewDecoder(r.Body).Decode(&amp;u)
+	if err != nil {
+		http.Error(w, &#34;bad json: &#34;+err.Error(), 400)
+		return
+	}
+
+	if err := h.svc.Create(ctx, &amp;u); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	json.NewEncoder(w).Encode(u)
+}
+
+func (h *UserHandler) list(w http.ResponseWriter, r *http.Request) {
+	data, _ := h.svc.List(r.Context())
+	json.NewEncoder(w).Encode(data)
+}
+
+func (h *UserHandler) get(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, &#34;id&#34;))
+	u, err := h.svc.Get(r.Context(), id)
+	if err != nil {
+		http.Error(w, &#34;not found&#34;, 404)
+		return
+	}
+	json.NewEncoder(w).Encode(u)
+}
+
+func (h *UserHandler) update(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, &#34;id&#34;))
+
+	var u models.User
+	json.NewDecoder(r.Body).Decode(&amp;u)
+	u.ID = id
+
+	h.svc.Update(r.Context(), &amp;u)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *UserHandler) delete(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, &#34;id&#34;))
+	h.svc.Delete(r.Context(), id)
+	w.WriteHeader(http.StatusOK)
+}
+</code></pre><h3 id="file-producergo">File: producer.go</h3>
+<pre tabindex="0"><code>package kafka
+
+import (
+	&#34;context&#34;
+	&#34;encoding/json&#34;
+
+	&#34;github.com/segmentio/kafka-go&#34;
+)
+
+type Producer struct {
+	writer *kafka.Writer
+}
+
+func NewProducer(broker string, topic string) *Producer {
+	return &amp;Producer{
+		writer: &amp;kafka.Writer{
+			Addr:     kafka.TCP(broker),
+			Topic:    topic,
+			Balancer: &amp;kafka.LeastBytes{},
+		},
+	}
+}
+
+func (p *Producer) Send(ctx context.Context, key string, value any) error {
+	data, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return p.writer.WriteMessages(ctx, kafka.Message{
+		Key:   []byte(key),
+		Value: data,
+	})
+}
+</code></pre><h3 id="file-loggergo">File: logger.go</h3>
+<pre tabindex="0"><code>package logger
+
+import (
+	&#34;log/slog&#34;
+	&#34;os&#34;
+)
+
+var Log *slog.Logger
+
+func Init() {
+	handler := slog.NewJSONHandler(os.Stdout, &amp;slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	Log = slog.New(handler)
+}
+</code></pre><h3 id="file-metricsgo">File: metrics.go</h3>
+<pre tabindex="0"><code>package metrics
+
+import (
+	&#34;net/http&#34;
+
+	&#34;github.com/prometheus/client_golang/prometheus&#34;
+	&#34;github.com/prometheus/client_golang/prometheus/promhttp&#34;
+)
+
+var (
+	HttpRequests = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: &#34;app&#34;,
+			Name:      &#34;http_requests_total&#34;,
+			Help:      &#34;Total HTTP requests&#34;,
+		},
+		[]string{&#34;method&#34;, &#34;route&#34;, &#34;status&#34;},
+	)
+
+	HttpDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: &#34;app&#34;,
+			Name:      &#34;http_request_duration_seconds&#34;,
+			Help:      &#34;Request duration&#34;,
+			Buckets:   prometheus.DefBuckets,
+		},
+		[]string{&#34;method&#34;, &#34;route&#34;},
+	)
+)
+
+func Init() {
+	prometheus.MustRegister(HttpRequests, HttpDuration)
+}
+
+func MetricsHandler() http.Handler {
+	return promhttp.Handler()
+}
+</code></pre><h3 id="file-metrics_middlewarego">File: metrics_middleware.go</h3>
+<pre tabindex="0"><code>package middlewares
+
+import (
+	&#34;net/http&#34;
+	&#34;service1/internal/metrics&#34;
+	&#34;time&#34;
+
+	&#34;github.com/go-chi/chi&#34;
+)
+
+type statusRecorder struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *statusRecorder) WriteHeader(code int) {
+	r.status = code
+	r.ResponseWriter.WriteHeader(code)
+}
+
+func PrometheusMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rec := &amp;statusRecorder{
+			ResponseWriter: w,
+			status:         http.StatusOK,
+		}
+
+		if r.URL.Path == &#34;/metrics&#34; {
+			next.ServeHTTP(w, r)
+			return
+		}
+		start := time.Now()
+
+		next.ServeHTTP(rec, r) // ✅ only once
+
+		duration := time.Since(start).Seconds()
+
+		rctx := chi.RouteContext(r.Context())
+
+		route := &#34;unknown&#34;
+		if rctx != nil {
+			if pattern := rctx.RoutePattern(); pattern != &#34;&#34; {
+				route = pattern
+			}
+		}
+
+		metrics.HttpDuration.WithLabelValues(
+			r.Method,
+			route,
+		).Observe(duration)
+
+		metrics.HttpRequests.WithLabelValues(
+			r.Method,
+			route,
+			http.StatusText(rec.status),
+		).Inc()
+	})
+}
+</code></pre><h3 id="file-modelsgo">File: models.go</h3>
+<pre tabindex="0"><code>package models
+
+type User struct {
+	ID    int    `json:&#34;id&#34;`
+	Name  string `json:&#34;name&#34;`
+	Email string `json:&#34;email&#34;`
+}
+</code></pre><h3 id="file-tracergo">File: tracer.go</h3>
+<pre tabindex="0"><code>package otelsetup
+
+import (
+	&#34;context&#34;
+	&#34;log&#34;
+
+	&#34;go.opentelemetry.io/otel&#34;
+	&#34;go.opentelemetry.io/otel/exporters/jaeger&#34;
+	&#34;go.opentelemetry.io/otel/sdk/resource&#34;
+	sdktrace &#34;go.opentelemetry.io/otel/sdk/trace&#34;
+)
+
+func InitTracer() func() {
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(
+		jaeger.WithEndpoint(&#34;http://localhost:14268/api/traces&#34;),
+	))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exp),
+		sdktrace.WithResource(resource.Default()),
+	)
+
+	otel.SetTracerProvider(tp)
+
+	return func() {
+		_ = tp.Shutdown(context.Background())
+	}
+}
+</code></pre><h3 id="file-repogo">File: repo.go</h3>
+<pre tabindex="0"><code>package repository
+
+import (
+	&#34;context&#34;
+	&#34;service1/internal/models&#34;
+
+	&#34;github.com/jackc/pgx/v5/pgxpool&#34;
+)
+
+type UserRepository interface {
+	Create(ctx context.Context, u *models.User) error
+	GetAll(ctx context.Context) ([]models.User, error)
+	GetByID(ctx context.Context, id int) (*models.User, error)
+	Update(ctx context.Context, u *models.User) error
+	Delete(ctx context.Context, id int) error
+}
+
+type userRepo struct {
+	db *pgxpool.Pool
+}
+
+func NewUserRepo(db *pgxpool.Pool) UserRepository {
+	return &amp;userRepo{db: db}
+}
+
+func (r *userRepo) Create(ctx context.Context, u *models.User) error {
+	return r.db.QueryRow(ctx,
+		&#34;INSERT INTO users(name,email) VALUES($1,$2) RETURNING id&#34;,
+		u.Name, u.Email).Scan(&amp;u.ID)
+}
+
+func (r *userRepo) GetAll(ctx context.Context) ([]models.User, error) {
+	rows, err := r.db.Query(ctx, &#34;SELECT id,name,email FROM users&#34;)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []models.User
+	for rows.Next() {
+		var u models.User
+		rows.Scan(&amp;u.ID, &amp;u.Name, &amp;u.Email)
+		list = append(list, u)
+	}
+	return list, nil
+}
+func (r *userRepo) GetByID(ctx context.Context, id int) (*models.User, error) {
+	var u models.User
+	err := r.db.QueryRow(ctx,
+		&#34;SELECT id,name,email FROM users WHERE id=$1&#34;, id).
+		Scan(&amp;u.ID, &amp;u.Name, &amp;u.Email)
+	return &amp;u, err
+}
+
+func (r *userRepo) Update(ctx context.Context, u *models.User) error {
+	_, err := r.db.Exec(ctx,
+		&#34;UPDATE users SET name=$1,email=$2 WHERE id=$3&#34;,
+		u.Name, u.Email, u.ID)
+	return err
+}
+
+func (r *userRepo) Delete(ctx context.Context, id int) error {
+	_, err := r.db.Exec(ctx, &#34;DELETE FROM users WHERE id=$1&#34;, id)
+	return err
+}
+</code></pre><h3 id="file-servicego">File: service.go</h3>
+<pre tabindex="0"><code>package service
+
+import (
+	&#34;context&#34;
+	&#34;errors&#34;
+	&#34;log/slog&#34;
+	&#34;service1/internal/events&#34;
+	&#34;service1/internal/kafka&#34;
+	&#34;service1/internal/logger&#34;
+	&#34;service1/internal/models&#34;
+	&#34;service1/internal/repository&#34;
+)
+
+type UserService interface {
+	Create(ctx context.Context, u *models.User) error
+	List(ctx context.Context) ([]models.User, error)
+	Get(ctx context.Context, id int) (*models.User, error)
+	Update(ctx context.Context, u *models.User) error
+	Delete(ctx context.Context, id int) error
+}
+
+type userService struct {
+	repo     repository.UserRepository
+	producer *kafka.Producer
+}
+
+var ErrInvalidInput = errors.New(&#34;invalid input&#34;)
+
+func NewUserService(r repository.UserRepository, p *kafka.Producer) UserService {
+	return &amp;userService{repo: r, producer: p}
+}
+
+func (s *userService) Create(ctx context.Context, u *models.User) error {
+	// example validation
+	if u.Email == &#34;&#34; {
+		return ErrInvalidInput
+	}
+
+	if err := s.repo.Create(ctx, u); err != nil {
+		return err
+	}
+
+	// emit event
+	event := events.UserCreatedEvent{
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
+	}
+	// fire-and-forget (basic)
+	if err := s.producer.Send(ctx, &#34;user_created&#34;, event); err != nil {
+		logger.Log.Error(&#34;migration failed&#34;, slog.Any(&#34;error&#34;, err))
+
+	}
+
+	return nil
+}
+
+func (s *userService) List(ctx context.Context) ([]models.User, error) {
+	return s.repo.GetAll(ctx)
+}
+
+func (s *userService) Get(ctx context.Context, id int) (*models.User, error) {
+	return s.repo.GetByID(ctx, id)
+}
+
+func (s *userService) Update(ctx context.Context, u *models.User) error {
+	return s.repo.Update(ctx, u)
+}
+
+func (s *userService) Delete(ctx context.Context, id int) error {
+	return s.repo.Delete(ctx, id)
+}
+</code></pre>
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

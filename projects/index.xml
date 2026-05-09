@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on Shubham Panchal - Engineering Lead</title>
+    <link>https://subpxl.github.io/projects/</link>
+    <description>Recent content in Projects on Shubham Panchal - Engineering Lead</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 09 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://subpxl.github.io/projects/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>apigateway</title>
+      <link>https://subpxl.github.io/projects/apigateway/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/apigateway/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/apigateway&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;microservices-api-gateway-demo&#34;&gt;Microservices API Gateway Demo&lt;/h1&gt;&#xA;&lt;p&gt;A demonstration of microservices architecture using Traefik as an API gateway with Go, Flask, and FastAPI backends.&lt;/p&gt;&#xA;&lt;h2 id=&#34;project-structure&#34;&gt;Project Structure&lt;/h2&gt;&#xA;&lt;p&gt;├── docker-compose.yml&#xA;├── flask-service/&#xA;├── go-service/&#xA;├── fastapi-service/&#xA;└── README.md&lt;/p&gt;&#xA;&lt;h2 id=&#34;quick-start&#34;&gt;Quick Start&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Clone the repository:&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/subpxl/apigateway&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd apigateway&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;start-the-services&#34;&gt;Start the services:&lt;/h2&gt;&#xA;&lt;p&gt;docker-compose up -d&lt;/p&gt;&#xA;&lt;h2 id=&#34;testing-the-services&#34;&gt;Testing the Services&lt;/h2&gt;&#xA;&lt;p&gt;Access the various services at these endpoints:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Flask service: http://localhost/flask&lt;/li&gt;&#xA;&lt;li&gt;Go service: http://localhost/go&lt;/li&gt;&#xA;&lt;li&gt;FastAPI service: http://localhost/fastapi&lt;/li&gt;&#xA;&lt;li&gt;Traefik dashboard: http://localhost:8080&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;stop-the-services&#34;&gt;Stop the services:&lt;/h2&gt;&#xA;&lt;p&gt;docker-compose down&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>braillenext</title>
+      <link>https://subpxl.github.io/projects/braillenext/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/braillenext/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/braillenext&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;braillenext&#34;&gt;Braillenext&lt;/h1&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://braillenext.web.app/&#34;&gt;Braillenext&lt;/a&gt; is an open-source project aimed at creating an assistive device for the visually impaired. This device uses a combination of Raspberry Pi, Arduino, and various sensors to detect text and objects, converting them into tactile feedback.&lt;/p&gt;&#xA;&lt;h2 id=&#34;table-of-contents&#34;&gt;Table of Contents&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;a href=&#34;#hardware-requirements&#34;&gt;Hardware Requirements&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;#assembly-instructions&#34;&gt;Assembly Instructions&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;#software-setup&#34;&gt;Software Setup&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;#usage&#34;&gt;Usage&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;#development&#34;&gt;Development&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;hardware-requirements&#34;&gt;Hardware Requirements&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Raspberry Pi Zero&lt;/li&gt;&#xA;&lt;li&gt;Arduino Nano&lt;/li&gt;&#xA;&lt;li&gt;LiDAR sensor&lt;/li&gt;&#xA;&lt;li&gt;Pi Camera&lt;/li&gt;&#xA;&lt;li&gt;Acrylic sheet (4 or 5mm)&lt;/li&gt;&#xA;&lt;li&gt;Strong adhesive&lt;/li&gt;&#xA;&lt;li&gt;Other electronic components as specified in the schematics&lt;/li&gt;&#xA;&lt;li&gt;Power supply (battery)&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;assembly-instructions&#34;&gt;Assembly Instructions&lt;/h2&gt;&#xA;&lt;h3 id=&#34;mechanical-assembly&#34;&gt;Mechanical Assembly&lt;/h3&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Use CorelDRAW and a laser cutter to cut the acrylic sheets according to the provided drawings.&lt;/li&gt;&#xA;&lt;li&gt;Assemble the cut parts as shown in the reference images.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h3 id=&#34;electronic-assembly&#34;&gt;Electronic Assembly&lt;/h3&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Wire the Arduino Nano components according to the schematics.&lt;/li&gt;&#xA;&lt;li&gt;Connect the Raspberry Pi Zero components as per the provided diagrams.&lt;/li&gt;&#xA;&lt;li&gt;Set up a common power supply for both the Arduino and Raspberry Pi.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;software-setup&#34;&gt;Software Setup&lt;/h2&gt;&#xA;&lt;h3 id=&#34;arduino-setup&#34;&gt;Arduino Setup&lt;/h3&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Connect the Arduino Nano to your PC.&lt;/li&gt;&#xA;&lt;li&gt;Use the Arduino IDE to upload the LiDAR code to the Arduino Nano.&lt;/li&gt;&#xA;&lt;li&gt;Test the Arduino setup (LiDAR and vibrating coin motor).&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h3 id=&#34;raspberry-pi-setup&#34;&gt;Raspberry Pi Setup&lt;/h3&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;Burn Raspberry Pi OS onto an SD card for the Raspberry Pi Zero.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>engineering-deep-dive</title>
+      <link>https://subpxl.github.io/projects/engineering-deep-dive/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/engineering-deep-dive/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/engineering-deep-dive&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>fastapi-blog</title>
+      <link>https://subpxl.github.io/projects/fastapi-blog/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/fastapi-blog/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/fastapi-blog&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;project name = fastapi blog&lt;/p&gt;&#xA;&lt;h1 id=&#34;to-run-with-docker&#34;&gt;to run with docker&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;docker-compose build &amp;ndash;no-cache web&lt;/li&gt;&#xA;&lt;li&gt;docker-compose up&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h1 id=&#34;to-run-simple&#34;&gt;to run simple&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;python -m venv venv&lt;/li&gt;&#xA;&lt;li&gt;venv/bin/activate&lt;/li&gt;&#xA;&lt;li&gt;python -m pip install -r ./app/requirements.txt&lt;/li&gt;&#xA;&lt;li&gt;python.exe ./app/main.py&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h1 id=&#34;endpoints&#34;&gt;endpoints&lt;/h1&gt;&#xA;&lt;p&gt;http://localhost:8000/docs#&lt;/p&gt;&#xA;&lt;h1 id=&#34;endpoints-public&#34;&gt;endpoints public&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;http://localhost:8000/api/blogs/public&lt;/li&gt;&#xA;&lt;li&gt;http://localhost:8000/api/blogs/public?status=publish&lt;/li&gt;&#xA;&lt;li&gt;http://localhost:8000/api/blogs/public?status=draft&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;scheduler is set at 1 minute&lt;/p&gt;&#xA;&lt;h1 id=&#34;example-credentials&#34;&gt;example credentials&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;username = admin&lt;/li&gt;&#xA;&lt;li&gt;email = &lt;a href=&#34;mailto:admin@admin.com&#34;&gt;admin@admin.com&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;password = admin&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h1 id=&#34;other&#34;&gt;other&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;auth = jwt&lt;/li&gt;&#xA;&lt;li&gt;routes =  auth ,blog&lt;/li&gt;&#xA;&lt;li&gt;database = sqlite3&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+    </item>
+    <item>
+      <title>GopherAgent</title>
+      <link>https://subpxl.github.io/projects/gopheragent/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/gopheragent/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/GopherAgent&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>langchain-rag</title>
+      <link>https://subpxl.github.io/projects/langchain-rag/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/langchain-rag/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/langchain-rag&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;langchain-rag&#34;&gt;langchain-rag&lt;/h1&gt;&#xA;&lt;p&gt;&lt;img src=&#34;langchain%20rag.png&#34; alt=&#34;langchain rag.&#34; title=&#34;langchain rag&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;to start&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;uv venv&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;uv sync&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;uv run python main.py&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>microservice-project</title>
+      <link>https://subpxl.github.io/projects/microservice-project/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/microservice-project/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/microservice-project&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>microservices-for-beginners</title>
+      <link>https://subpxl.github.io/projects/microservices-for-beginners/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/microservices-for-beginners/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/microservices-for-beginners&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;go-microservices-e-commerce-platform&#34;&gt;Go Microservices E-commerce Platform&lt;/h1&gt;&#xA;&lt;p&gt;A scalable, event-driven E-commerce backend built with &lt;strong&gt;Go (Golang)&lt;/strong&gt;, structured around the microservices architecture. It features an API Gateway for centralized routing, JWT-based authentication, async messaging with RabbitMQ, and a comprehensive OpenTelemetry observability stack.&lt;/p&gt;&#xA;&lt;h2 id=&#34;-technologies-used&#34;&gt;🚀 Technologies Used&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Languages:&lt;/strong&gt; Go (Golang)&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;API Gateway &amp;amp; Routing:&lt;/strong&gt; &lt;code&gt;go-chi/chi&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Messaging / Event Broker:&lt;/strong&gt; RabbitMQ&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Databases:&lt;/strong&gt; PostgreSQL / SQLite&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Observability:&lt;/strong&gt; OpenTelemetry (Otel), Prometheus, Loki, Promtail, Tempo, Grafana&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Deployment:&lt;/strong&gt; Docker, Docker Compose, Kubernetes&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;-architecture--system-design&#34;&gt;🏗️ Architecture &amp;amp; System Design&lt;/h2&gt;&#xA;&lt;h3 id=&#34;1-total-architecture&#34;&gt;1. Total Architecture&lt;/h3&gt;&#xA;&lt;p&gt;The system consists of independent microservices handling specific domains. The &lt;strong&gt;API Gateway&lt;/strong&gt; acts as the central entry point, routing requests to the respective services.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>skillhub</title>
+      <link>https://subpxl.github.io/projects/skillhub/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/skillhub/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/skillhub&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;all skills in 1 place for any agent to use&#xA;�&#xA;�https://github.com/subpxl/skillhub/edit/main/README.md&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>streamprocessing</title>
+      <link>https://subpxl.github.io/projects/streamprocessing/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/streamprocessing/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/streamprocessing&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;streamprocessing&#34;&gt;streamprocessing&lt;/h1&gt;&#xA;&lt;p&gt;streamprocessing golang architecture&lt;/p&gt;&#xA;&lt;p&gt;go consumer with kafka endpoint&#xA;go producer  with kafka endpoint&#xA;kafka   docker  without zookeeper&#xA;processor&lt;/p&gt;&#xA;&lt;p&gt;analytics  + websocket  + 1 webpage loded html&lt;/p&gt;&#xA;&lt;p&gt;create topic&lt;/p&gt;&#xA;&lt;p&gt;docker exec -it kafka kafka-topics &amp;ndash;create &amp;ndash;topic streamprocessing &amp;ndash;bootstrap-server localhost:9092 &amp;ndash;replication-factor 1 &amp;ndash;partitions 1&lt;/p&gt;&#xA;&lt;p&gt;consumde from confluentinc&#xA;docker exec -it $(docker ps &amp;ndash;filter &amp;ldquo;ancestor=confluentinc/cp-kafka&amp;rdquo; -q) &lt;br&gt;&#xA;kafka-console-consumer &amp;ndash;topic streamprocessing &amp;ndash;from-beginning &amp;ndash;bootstrap-server localhost:9092&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>subpxl.github.io</title>
+      <link>https://subpxl.github.io/projects/subpxl.github.io/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/subpxl.github.io/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/subpxl.github.io&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;subpxlgithubio&#34;&gt;subpxl.github.io&lt;/h1&gt;&#xA;&lt;p&gt;Shubham panchal work profile&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>temporal-keda-autoscaling</title>
+      <link>https://subpxl.github.io/projects/temporal-keda-autoscaling/</link>
+      <pubDate>Sat, 09 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://subpxl.github.io/projects/temporal-keda-autoscaling/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/subpxl/temporal-keda-autoscaling&#34;&gt;View GitHub Repository&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;keda pod autoscaling for a worker pod written in golang&#xA;pod can be any application&lt;/p&gt;&#xA;&lt;p&gt;keda takes a trigger and scales the pod&lt;/p&gt;&#xA;&lt;p&gt;the triggers are&#xA;temporal task queue lenght&#xA;rabbitmq message queue length&lt;/p&gt;&#xA;&lt;p&gt;to start with rabbitmq trigger run hit_rabbitmq/main.go to send messages to rabbitmq&lt;/p&gt;&#xA;&lt;p&gt;for temporal queue length , it requires a lot of tasks in queue  with big timeouts at same time&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;flow.png&#34; alt=&#34;flow&#34;&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;start-here&#34;&gt;Start Here&lt;/h1&gt;&#xA;&lt;p&gt;this can be achieved witrh task file&#xA;or&#xA;for individual steps&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham Panchal - Engineering Lead</title><meta name="description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Golang Testing.
+File: main.go package mainimport (&#34;database/sql&#34; …"><meta property="og:title" content="Golang Testing"><meta property="og:description" content="Research &amp; Code Notes This document contains text-heavy extracts and code snippets from my research on Golang Testing.
+File: main.go package mainimport (&#34;database/sql&#34; …"><meta property="og:type" content="article">
+    <meta property="og:url" content="https://subpxl.github.io/research/golang-testing/">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#f8f9fa">
+    <link rel="icon" href="https://subpxl.github.io/favicon.svg" type="image/svg+xml">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8f9fa; color: #212529; }
+        .navbar { background-color: #ffffff; border-bottom: 1px solid #e9ecef; }
+        .card { border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; border-radius: 8px;}
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .badge-custom { background-color: #e9ecef; color: #495057; font-weight: 500; }
+        footer { padding: 2rem 0; text-align: center; color: #6c757d; margin-top: 3rem; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="https://subpxl.github.io/">Shubham Panchal - Engineering Lead</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/projects/">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/presentations/">Presentations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://subpxl.github.io/research/">Research</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        
+<div class="card bg-white p-4 p-md-5 mb-5 shadow-sm border-0">
+    <div class="mb-4">
+        <a href="https://subpxl.github.io/" class="text-muted text-decoration-none">&larr; Back Home</a>
+    </div>
+    
+    
+    
+    <span class="badge bg-secondary mb-3">Deep Dive</span>
+    
+    
+    <h1 class="display-5 fw-bold mb-3 text-dark">Golang Testing</h1>
+    
+    <div class="text-muted small mb-5 border-bottom pb-4">
+        Published on May 9, 2026
+    </div>
+
+    
+        
+        <div class="content" style="line-height: 1.8; color: #495057; font-size: 1.1rem;">
+            <h2 id="research--code-notes">Research &amp; Code Notes</h2>
+<p>This document contains text-heavy extracts and code snippets from my research on Golang Testing.</p>
+<h3 id="file-maingo">File: main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+    &#34;database/sql&#34;
+    &#34;fmt&#34;
+    &#34;log&#34;
+    
+    _ &#34;github.com/lib/pq&#34;
+    &#34;gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer&#34;
+)
+
+type Product struct {
+    ID    int
+    Name  string
+    Price float64
+}
+
+// InitDB initializes a connection to the database
+func InitDB() (*sql.DB, error) {
+    connStr := &#34;user=postgres password=mysecretpassword dbname=mydb sslmode=disable&#34;
+    db, err := sql.Open(&#34;postgres&#34;, connStr)
+    if err != nil {
+        return nil, err
+    }
+    return db, nil
+}
+
+// GetAllProducts retrieves all products from the database
+func GetAllProducts(db *sql.DB) ([]Product, error) {
+    rows, err := db.Query(&#34;SELECT id, name, price FROM products&#34;)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var products []Product
+    for rows.Next() {
+        var p Product
+        if err := rows.Scan(&amp;p.ID, &amp;p.Name, &amp;p.Price); err != nil {
+            return nil, err
+        }
+        products = append(products, p)
+    }
+
+    return products, nil
+}
+
+func main() {
+    // Start datadog tracer
+    tracer.Start(tracer.WithServiceName(&#34;get-all-products-service&#34;))
+    defer tracer.Stop()
+
+    db, err := InitDB()
+    if err != nil {
+        log.Fatalf(&#34;failed to initialize database: %v&#34;, err)
+    }
+    
+    products, err := GetAllProducts(db)
+    if err != nil {
+        log.Fatalf(&#34;failed to retrieve products: %v&#34;, err)
+    }
+
+    for _, p := range products {
+        fmt.Printf(&#34;Product: ID=%d, Name=%s, Price=%.2f\n&#34;, p.ID, p.Name, p.Price)
+    }
+}
+</code></pre><h3 id="file-main_testgo">File: main_test.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;testing&#34;
+
+	&#34;github.com/DATA-DOG/go-sqlmock&#34;
+	&#34;github.com/stretchr/testify/assert&#34;
+)
+
+func TestGetAllProducts(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf(&#34;an error &#39;%s&#39; was not  expected when opening a stub database connection&#34;, err)
+	}
+	defer db.Close()
+
+	// Mock the rows that would be returned by the database
+	rows := sqlmock.NewRows([]string{&#34;id&#34;, &#34;name&#34;, &#34;price&#34;}).
+		AddRow(1, &#34;Product1&#34;, 10.5).
+		AddRow(2, &#34;Product2&#34;, 20.0)
+
+	// Expect the query to be executed
+	mock.ExpectQuery(&#34;SELECT id, name, price FROM products&#34;).
+		WillReturnRows(rows)
+
+	// Call the GetAllProducts function
+	products, err := GetAllProducts(db)
+	assert.NoError(t, err)
+	assert.Len(t, products, 2)
+	assert.Equal(t, &#34;Product1&#34;, products[0].Name)
+	assert.Equal(t, 10.5, products[0].Price)
+
+	// Ensure all expectations are met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf(&#34;there were unfulfilled expectations: %s&#34;, err)
+	}
+}
+</code></pre>
+        </div>
+    
+</div>
+
+<style>
+    .content h1, .content h2 { margin-top: 2rem; margin-bottom: 1rem; color: #212529; font-weight: bold; border-bottom: 1px solid #e9ecef; padding-bottom: 0.5rem; }
+    .content h3 { margin-top: 1.5rem; margin-bottom: 1rem; color: #343a40; }
+    .content pre { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; border: 1px solid #e9ecef; margin: 1.5rem 0; }
+    .content code { color: #d63384; font-family: monospace; }
+    .content pre code { color: #212529; }
+    .content img { max-width: 100%; height: auto; border-radius: 8px; margin: 2rem auto; display: block; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .row img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content p { margin-bottom: 1.5rem; }
+    .content a[href*="github.com"] { display: inline-block; background-color: #24292e; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 1rem 0; }
+    .content a[href*="github.com"]:hover { background-color: #1b1f23; }
+</style>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Shubham Panchal - Engineering Lead. Built with Hugo & Bootstrap.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
